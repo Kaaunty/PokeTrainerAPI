@@ -1,8 +1,8 @@
 ﻿using PokeApiNet;
 
-namespace NowComesGtk.BackEnd
+namespace PokeApi.BackEnd
 {
-    internal class ApiRequest
+    public class ApiRequest
     {
         private PokeApiClient pokeApiClient = new PokeApiClient();
 
