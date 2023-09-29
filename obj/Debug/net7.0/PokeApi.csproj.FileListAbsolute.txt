@@ -1,0 +1,12 @@
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\bin\Debug\net7.0\PokeApi.deps.json
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\bin\Debug\net7.0\PokeApi.dll
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\bin\Debug\net7.0\PokeApi.pdb
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\obj\Debug\net7.0\PokeApi.csproj.AssemblyReference.cache
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\obj\Debug\net7.0\PokeApi.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\obj\Debug\net7.0\PokeApi.AssemblyInfoInputs.cache
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\obj\Debug\net7.0\PokeApi.AssemblyInfo.cs
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\obj\Debug\net7.0\PokeApi.csproj.CoreCompileInputs.cache
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\obj\Debug\net7.0\PokeApi.dll
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\obj\Debug\net7.0\refint\PokeApi.dll
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\obj\Debug\net7.0\PokeApi.pdb
+C:\Users\Dell\source\repos\PokeTrainer20003\PokeApi\obj\Debug\net7.0\ref\PokeApi.dll
