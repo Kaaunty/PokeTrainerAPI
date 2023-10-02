@@ -9,8 +9,6 @@ namespace PokeApi.BackEnd.Service
 {
     public class ApiRequest
     {
-        private readonly PokeApiClient pokeApiClient = new PokeApiClient();
-
         private int current = 0;
 
         public Pokemon? GetPokemon(string pokename)
