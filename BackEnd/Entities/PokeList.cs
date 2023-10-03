@@ -21,5 +21,7 @@ namespace PokeApi.BackEnd.Entities
 
         [JsonProperty("results")]
         public List<Pokemon> result { get; set; }
+
+        public List<PokemonType> type { get; set; }
     }
 }
