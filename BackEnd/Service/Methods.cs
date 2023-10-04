@@ -4,6 +4,7 @@ using PokeApiNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,97 +13,92 @@ namespace PokeApi.BackEnd.Service
     public class Methods
     {
         private readonly ApiRequest _apiRequest = new ApiRequest();
+        private List<Pokemon> pokemonlist;
+        private Image Pokeball = new Image();
 
-        public async Task Test(EventBox fix, int currentpage)
+        public async Task Initialize(int currentPage, string type, int choice)
         {
-            List<Pokemon> pokemons = await _apiRequest.LoadPokemonListAsync(currentpage);
-            List<string> pokemonNames = new List<string>();
-            foreach (Pokemon pokemon in pokemons)
-            {
-                Console.WriteLine(pokemon.Name);
-                pokemonNames.Add(pokemon.Name);
-            }
-            List<byte[]> pokemonImages = await _apiRequest.GetPokemonImagesAsync(pokemonNames);
-            Console.WriteLine(pokemonImages.Count);
-            Console.WriteLine("Fim");
+            await LoadPokemonList(currentPage, type, choice);
         }
 
-        public async Task ModifyButton(Fixed fix, int currentPage)
+        public async Task LoadPokemonList(int currentPage, string type, int choice)
         {
-            List<Pokemon> pokemonList = await _apiRequest.LoadPokemonListAsync(currentPage);
-
-            foreach (var button in fix.AllChildren)
+            if (choice == 0)
             {
-                if (button is Button)
-                {
-                    Button btn = (Button)button;
-                    if (VerifyButtonName(btn.Name))
-                    {
-                        Console.WriteLine(btn.Name);
-                    }
-                }
+                pokemonlist = await _apiRequest.GetPokemonListByTypeAll(currentPage, type);
             }
-            Console.WriteLine("Fim");
+            if (choice == 1)
+            {
+                pokemonlist = await _apiRequest.GetPokemonListByTypePure(currentPage, type);
+            }
+            else if (choice == 2)
+            {
+                pokemonlist = await _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
+            }
         }
 
-        public async Task ModifyAll2(EventBox fix, int currentPage)
+        public async void UpdateButtons(Fixed fix, int currentPage, string type, int choice)
         {
-            List<Pokemon> pokemonList = await _apiRequest.LoadPokemonListAsync(currentPage);
-
-            foreach (Fixed fixs in fix.AllChildren)
-            {
-                foreach (var button in fixs.AllChildren)
-                {
-                    if (button is Button)
-                    {
-                        Button btn = (Button)button;
-                        if (VerifyButtonName(btn.Name))
-                        {
-                        }
-                    }
-                }
-            }
-
-            Console.WriteLine("Fim");
-        }
-
-        public async Task ModifyAll(EventBox fix, int currentPage)
-        {
-            List<Pokemon> pokemonList = await _apiRequest.LoadPokemonListAsync(currentPage);
-
+            await Initialize(currentPage, type, choice);
+            Pokeball = new Image("Images/pokeball.png");
             int buttonIndex = 0;
 
-            foreach (Fixed fixs in fix.AllChildren)
+            foreach (var widget in fix.AllChildren)
             {
-                foreach (var button in fixs.AllChildren)
+                if (widget is VBox)
                 {
-                    if (button is Button)
+                    var vboxwidget = (VBox)widget;
+                    foreach (var button in vboxwidget.AllChildren)
                     {
                         Button btn = (Button)button;
-                        if (VerifyButtonName(btn.Name))
+
+                        if (buttonIndex < pokemonlist.Count)
                         {
-                            if (buttonIndex < pokemonList.Count)
+                            btn.Data["id"] = pokemonlist[buttonIndex].Id;
+                            btn.Data["name"] = pokemonlist[buttonIndex].Name;
+                            btn.Sensitive = true;
+                            btn.Image = Pokeball;
+
+                            if (VerifyButtonName(btn.Name))
                             {
-                                var pokemon = pokemonList[buttonIndex];
-                                Console.WriteLine(buttonIndex + pokemon.Id);
+                                var pokemon = pokemonlist[buttonIndex];
                                 UpdateButtonImages(btn, pokemon.Id);
                             }
+
                             buttonIndex++;
+                        }
+                        else
+                        {
+                            // No more Pokémon to show
+                            btn.Sensitive = false;
+                            btn.Data["id"] = 0;
+                            btn.Data["name"] = "";
+                            btn.Image = null;
+                            if (btn.Image == null)
+                            {
+                                btn.Image = Pokeball;
+                            }
                         }
                     }
                 }
             }
-
-            Console.WriteLine("Fim");
         }
 
-        private async Task UpdateButtonImages(Button button, int id)
+        private void UpdateButtonImages(Button button, int id)
         {
-            Image pokemonImage = GetImage(id).Result;
+            //Image pokemonImage = await GetImage(id);
+            Image pokeimage = new Image();
 
+            Pixbuf pokemonImage = _apiRequest.LoadPokemonSprite(id);
             if (pokemonImage != null)
             {
-                button.Image = pokemonImage;
+                pokemonImage = pokemonImage.ScaleSimple(40, 40, InterpType.Bilinear);
+                pokeimage.Pixbuf = pokemonImage;
+            }
+
+            if (pokeimage != null)
+            {
+                button.Image = pokeimage;
             }
         }
 
@@ -329,6 +325,14 @@ namespace PokeApi.BackEnd.Service
                 return true;
             }
             if (name == "pokemon49")
+            {
+                return true;
+            }
+            if (name == "pokemon50")
+            {
+                return true;
+            }
+            if (name == "pokemon51")
             {
                 return true;
             }
