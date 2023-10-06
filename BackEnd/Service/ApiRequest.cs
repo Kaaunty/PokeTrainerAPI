@@ -1,13 +1,6 @@
 ﻿using Gdk;
-using Gtk;
 using PokeApiNet;
-using System.Net;
-using ImageMagick;
-using ImageMagickSharp;
 using Task = System.Threading.Tasks.Task;
-using GLib;
-using System.Diagnostics;
-using System;
 
 namespace PokeApi.BackEnd.Service
 {
@@ -182,13 +175,54 @@ namespace PokeApi.BackEnd.Service
             double progress = 0.0;
             int totalpokemoncount = PokeList.pokemonList.Count;
 
-            if (totalpokemoncount == 200)
+            if (totalpokemoncount == 0)
             {
-                progress = 0.2;
                 return progress;
             }
-
-            return 0.0;
+            if (totalpokemoncount > 0)
+            {
+                if (totalpokemoncount == 200)
+                {
+                    progress = 0.2;
+                    return progress;
+                }
+                else if (totalpokemoncount == 400)
+                {
+                    progress = 0.4;
+                    return progress;
+                }
+                else if (totalpokemoncount == 600)
+                {
+                    progress = 0.6;
+                    return progress;
+                }
+                else if (totalpokemoncount == 800)
+                {
+                    progress = 0.8;
+                    return progress;
+                }
+                else if (totalpokemoncount == 1000)
+                {
+                    progress = 0.85;
+                    return progress;
+                }
+                else if (totalpokemoncount == 1200)
+                {
+                    progress = 0.9;
+                    return progress;
+                }
+                else if (totalpokemoncount == 1292)
+                {
+                    progress = 1.0;
+                    return progress;
+                }
+            }
+            else
+            {
+                progress = 1.0;
+                return progress;
+            }
+            return progress;
         }
     }
 }
