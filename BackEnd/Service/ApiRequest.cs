@@ -1,23 +1,27 @@
 ﻿using Gdk;
 using Gtk;
 using PokeApiNet;
-using System.Drawing;
-using System.Net.Http;
-using System.Security.Authentication;
+using System.Net;
+using ImageMagick;
+using ImageMagickSharp;
 using Task = System.Threading.Tasks.Task;
+using GLib;
+using System.Diagnostics;
+using System;
 
 namespace PokeApi.BackEnd.Service
 {
     public class ApiRequest
     {
-        private PokeApiClient pokeClient = new PokeApiClient();
+#nullable disable
+        private readonly PokeApiClient pokeClient = new PokeApiClient();
 
         public static class PokeList
         {
             public static List<Pokemon> pokemonList = new List<Pokemon>();
         }
 
-        private async Task<Pokemon> GetPokemonAsync(string name)
+        public async Task<Pokemon> GetPokemonAsync(string name)
         {
             Pokemon pokemon = await pokeClient.GetResourceAsync<Pokemon>(name);
 
@@ -32,27 +36,27 @@ namespace PokeApi.BackEnd.Service
             {
                 do
                 {
-                    int totalpokemoncount = 1500;
+                    int totalpokemoncount = 200;
                     var page = await pokeClient.GetNamedResourcePageAsync<Pokemon>(totalpokemoncount, currentPage);
-                    var tasks = page.Results.Select(result => GetPokemonAsync(result.Name)).ToArray();
-                    hasEmptyResults = tasks.Length == 0;
+                    var tasks = page.Results.Select(result => GetPokemonAsync(result.Name)).ToList();
+                    hasEmptyResults = tasks.Count == 0;
 
                     if (!hasEmptyResults)
                     {
                         await Task.WhenAll(tasks);
                         PokeList.pokemonList.AddRange(tasks.Select(task => task.Result));
-                        currentPage += 1500;
+                        currentPage += 200;
                     }
                 } while (!hasEmptyResults);
                 return PokeList.pokemonList;
             }
             catch (Exception)
             {
-                return null;
+                throw;
             }
         }
 
-        public async Task<List<Pokemon>> GetPokemonListByTypePure(int currentpage, string type)
+        public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
         {
             string lowercasetype = type.ToLower();
             try
@@ -65,11 +69,11 @@ namespace PokeApi.BackEnd.Service
             }
             catch (Exception)
             {
-                return null;
+                throw;
             }
         }
 
-        public async Task<List<Pokemon>> GetPokemonListByTypeAll(int currentpage, string type)
+        public List<Pokemon> GetPokemonListByTypeAll(int currentpage, string type)
         {
             string lowercasetype = type.ToLower();
             try
@@ -86,7 +90,7 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public async Task<List<Pokemon>> GetPokemonListByTypeHalfType(int currentpage, string type)
+        public List<Pokemon> GetPokemonListByTypeHalfType(int currentpage, string type)
         {
             string lowercasetype = type.ToLower();
             try
@@ -103,58 +107,88 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public Pixbuf LoadPokemonSprite(int id)
+        public List<Pokemon> GetPokemonlistByHalfTypeSecondary(int currentPage, string type)
         {
-            string url = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{id}.png";
+            string lowercasetype = type.ToLower();
             try
             {
-                var loader = new PixbufLoader();
-                loader.Write(new System.Net.WebClient().DownloadData(url));
-                loader.Close();
+                var pokemonList = PokeList.pokemonList;
 
-                return loader.Pixbuf;
+                pokemonList = pokemonList.Where(pokemon => pokemon.Types.Count >= 2 && pokemon.Types[1].Type.Name == lowercasetype).ToList();
+                pokemonList = pokemonList.Skip(currentPage).Take(49).ToList();
+                return pokemonList;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Erro ao obter o sprite do Pokémon: {ex.Message}" + id);
-                return null;
+                throw;
             }
         }
 
-        public async Task<byte[]> GetPokemonSpriteAsync(int id)
+        public Pixbuf LoadPokemonSprite(int id)
         {
-            HttpClient _httpClient = new HttpClient();
-            Dictionary<int, byte[]> _imageCache = new Dictionary<int, byte[]>();
+            var poke = PokeList.pokemonList.FirstOrDefault(pokemon => pokemon.Id == id);
 
-            // Verifique se a imagem já está em cache
-            if (_imageCache.TryGetValue(id, out var cachedImage))
+            string url = poke.Sprites.FrontDefault;
+            if (url == null)
             {
-                return cachedImage;
+                url = poke.Sprites.Versions.GenerationVIII.Icons.FrontDefault;
             }
-
-            string url = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{id}.png";
 
             try
             {
-                var response = await _httpClient.GetAsync(url);
+                HttpClient httpClient = new HttpClient();
+                var loader = new PixbufLoader();
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var imageBytes = await response.Content.ReadAsByteArrayAsync();
-                    _imageCache[id] = imageBytes;
-                    return imageBytes;
-                }
-                else
-                {
-                    Console.WriteLine("Pokémon não encontrado!");
-                    return null;
-                }
+                var result = httpClient.GetByteArrayAsync(url).Result;
+                loader.Write(result);
+
+                loader.Close();
+                return loader.Pixbuf;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Erro ao obter o sprite do Pokémon: {ex.Message}");
-                return null;
+                throw;
             }
+        }
+
+        public async Task GetPokemonAnimatedSprite(string pokemonName)
+        {
+            string imageUrl = $"https://play.pokemonshowdown.com/sprites/xyani/{pokemonName.ToLower()}.gif";
+            string pastaDestino = "Images";
+            try
+            {
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    byte[] gifBytes = await httpClient.GetByteArrayAsync(imageUrl);
+
+                    if (!Directory.Exists(pastaDestino))
+                    {
+                        Directory.CreateDirectory(pastaDestino);
+                    }
+
+                    string nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimated.gif");
+
+                    File.WriteAllBytes(nomeArquivo, gifBytes);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public double GetProgress()
+        {
+            double progress = 0.0;
+            int totalpokemoncount = PokeList.pokemonList.Count;
+
+            if (totalpokemoncount == 200)
+            {
+                progress = 0.2;
+                return progress;
+            }
+
+            return 0.0;
         }
     }
 }

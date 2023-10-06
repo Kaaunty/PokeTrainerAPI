@@ -12,34 +12,39 @@ namespace PokeApi.BackEnd.Service
 {
     public class Methods
     {
-        private readonly ApiRequest _apiRequest = new ApiRequest();
+#nullable disable
+        private readonly ApiRequest _apiRequest = new();
         private List<Pokemon> pokemonlist;
         private Image Pokeball = new Image();
 
-        public async Task Initialize(int currentPage, string type, int choice)
+        public void Initialize(int currentPage, string type, int choice)
         {
-            await LoadPokemonList(currentPage, type, choice);
+            LoadPokemonList(currentPage, type, choice);
         }
 
-        public async Task LoadPokemonList(int currentPage, string type, int choice)
+        public void LoadPokemonList(int currentPage, string type, int choice)
         {
             if (choice == 0)
             {
-                pokemonlist = await _apiRequest.GetPokemonListByTypeAll(currentPage, type);
+                pokemonlist = _apiRequest.GetPokemonListByTypeAll(currentPage, type);
             }
             if (choice == 1)
             {
-                pokemonlist = await _apiRequest.GetPokemonListByTypePure(currentPage, type);
+                pokemonlist = _apiRequest.GetPokemonListByTypePure(currentPage, type);
             }
             else if (choice == 2)
             {
-                pokemonlist = await _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
+                pokemonlist = _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
+            }
+            else if (choice == 3)
+            {
+                pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
             }
         }
 
-        public async void UpdateButtons(Fixed fix, int currentPage, string type, int choice)
+        public void UpdateButtons(Fixed fix, int currentPage, string type, int choice)
         {
-            await Initialize(currentPage, type, choice);
+            Initialize(currentPage, type, choice);
             Pokeball = new Image("Images/pokeball.png");
             int buttonIndex = 0;
 
@@ -74,10 +79,54 @@ namespace PokeApi.BackEnd.Service
                             btn.Data["id"] = 0;
                             btn.Data["name"] = "";
                             btn.Image = null;
-                            if (btn.Image == null)
+                        }
+                    }
+                }
+            }
+        }
+
+        public void SearchPokemonName(Fixed fix, int currentPage, string type, int choice, string PokeName)
+        {
+            Initialize(currentPage, type, choice);
+
+            string pokemonName = PokeName.ToLower();
+            if (pokemonName != string.Empty && pokemonName != "Buscar Pokémon")
+            {
+                pokemonlist = pokemonlist.Where(pokemon => pokemon.Name.StartsWith(pokemonName)).ToList();
+            }
+
+            int buttonIndex = 0;
+
+            foreach (var widget in fix.AllChildren)
+            {
+                if (widget is VBox)
+                {
+                    var vboxwidget = (VBox)widget;
+                    foreach (var button in vboxwidget.AllChildren)
+                    {
+                        Button btn = (Button)button;
+
+                        if (buttonIndex < pokemonlist.Count)
+                        {
+                            btn.Data["id"] = pokemonlist[buttonIndex].Id;
+                            btn.Data["name"] = pokemonlist[buttonIndex].Name;
+                            btn.Sensitive = true;
+                            btn.Image = Pokeball;
+
+                            if (VerifyButtonName(btn.Name))
                             {
-                                btn.Image = Pokeball;
+                                var pokemon = pokemonlist[buttonIndex];
+                                UpdateButtonImages(btn, pokemon.Id);
                             }
+
+                            buttonIndex++;
+                        }
+                        else
+                        {
+                            btn.Sensitive = false;
+                            btn.Data["id"] = 0;
+                            btn.Data["name"] = "";
+                            btn.Image = null;
                         }
                     }
                 }
@@ -86,7 +135,6 @@ namespace PokeApi.BackEnd.Service
 
         private void UpdateButtonImages(Button button, int id)
         {
-            //Image pokemonImage = await GetImage(id);
             Image pokeimage = new Image();
 
             Pixbuf pokemonImage = _apiRequest.LoadPokemonSprite(id);
@@ -100,34 +148,6 @@ namespace PokeApi.BackEnd.Service
             {
                 button.Image = pokeimage;
             }
-        }
-
-        private async Task<Image> GetImage(int id)
-        {
-            Image pokemonImage = new Image();
-            var imageBytes = await _apiRequest.GetPokemonSpriteAsync(id);
-
-            if (imageBytes != null)
-            {
-                var pixbuf = new Gdk.Pixbuf(imageBytes);
-                pixbuf = pixbuf.ScaleSimple(40, 40, Gdk.InterpType.Bilinear);
-
-                if (pixbuf != null)
-                {
-                    pokemonImage.Pixbuf = pixbuf;
-                    pokemonImage.SetSizeRequest(40, 40);
-                    return pokemonImage;
-                }
-                else
-                {
-                    Console.WriteLine("Erro ao criar o Pixbuf da imagem.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Pokémon não encontrado.");
-            }
-            return pokemonImage;
         }
 
         private bool VerifyButtonName(string name)
