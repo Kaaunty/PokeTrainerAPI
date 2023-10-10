@@ -1,5 +1,8 @@
 ﻿using Gdk;
+using Newtonsoft.Json;
 using PokeApiNet;
+using System.Net;
+using System.Web;
 using Task = System.Threading.Tasks.Task;
 
 namespace PokeApi.BackEnd.Service
@@ -12,6 +15,7 @@ namespace PokeApi.BackEnd.Service
         public static class PokeList
         {
             public static List<Pokemon> pokemonList = new List<Pokemon>();
+            public static List<Move> pokemonMoves = new List<Move>();
         }
 
         public async Task<Pokemon> GetPokemonAsync(string name)
@@ -47,6 +51,26 @@ namespace PokeApi.BackEnd.Service
             {
                 throw;
             }
+        }
+
+
+        public async Task<List<Move>> GetMoveLearnedByPokemon(Pokemon pokemon)
+        {
+            try
+            {
+                List<Move> allMoves = await pokeClient.GetResourceAsync(pokemon.Moves.Select(move => move.Move));
+                return allMoves;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private async Task<Move> GetPokemonMoveAsync(string name)
+        {
+            Move move = await pokeClient.GetResourceAsync<Move>(name);
+            return move;
         }
 
         public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
@@ -110,6 +134,20 @@ namespace PokeApi.BackEnd.Service
                 pokemonList = pokemonList.Where(pokemon => pokemon.Types.Count >= 2 && pokemon.Types[1].Type.Name == lowercasetype).ToList();
                 pokemonList = pokemonList.Skip(currentPage).Take(49).ToList();
                 return pokemonList;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<PokemonSpecies> GetPokemonSpecies(string pokemonName)
+        {
+            string lowerCasePokemonName = pokemonName.ToLower();
+            try
+            {
+                PokemonSpecies pokemonSpecies = await pokeClient.GetResourceAsync<PokemonSpecies>(lowerCasePokemonName);
+                return pokemonSpecies;
             }
             catch (Exception)
             {
@@ -223,6 +261,79 @@ namespace PokeApi.BackEnd.Service
                 return progress;
             }
             return progress;
+        }
+
+        public async Task<EvolutionChain> GetEvolutionChain(string nextEvolution)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(nextEvolution))
+                {
+                    string[] urlParts = nextEvolution.Split('/');
+                    if (urlParts.Length >= 2)
+                    {
+                        if (int.TryParse(urlParts[urlParts.Length - 2], out int evolutionChainId))
+                        {
+                            var evolutionChain = await pokeClient.GetResourceAsync<EvolutionChain>(evolutionChainId);
+                            return evolutionChain;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid evolution chain ID.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid URL format.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("nextEvolution is empty.");
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Ability> GetPokemonAbility(string abilityName)
+        {
+            try
+            {
+                Ability ability = await pokeClient.GetResourceAsync<Ability>(abilityName);
+                if (ability != null)
+                {
+                    return ability;
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public String Translate(string input)
+        {
+            var fromLanguage = "en";
+            var toLanguage = "pt-BR";
+            var url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl={fromLanguage}&tl={toLanguage}&dt=t&q={HttpUtility.UrlEncode(input)}";
+            HttpClient httpClient = new HttpClient();
+            var result = httpClient.GetStringAsync(url).Result;
+            try
+            {
+                var jsonData = JsonConvert.DeserializeObject<dynamic>(result);
+                var translation = jsonData[0][0][0].ToString();
+                return translation;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
