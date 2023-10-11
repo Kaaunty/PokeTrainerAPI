@@ -15,7 +15,7 @@ namespace PokeApi.BackEnd.Service
 #nullable disable
         private readonly ApiRequest _apiRequest = new();
         private List<Pokemon> pokemonlist;
-        private Image Pokeball = new Image();
+        private Image Pokeball = new Image("Images/pokeball.png");
 
         public void Initialize(int currentPage, string type, int choice)
         {
@@ -48,33 +48,29 @@ namespace PokeApi.BackEnd.Service
             Pokeball = new Image("Images/pokeball.png");
             int buttonIndex = 0;
 
-            foreach (var widget in fix.AllChildren)
+            foreach (var button in fix.AllChildren)
             {
-                if (widget is VBox)
+                if (button is Button)
                 {
-                    var vboxwidget = (VBox)widget;
-                    foreach (var button in vboxwidget.AllChildren)
+                    Button btn = (Button)button;
+                    if (VerifyButtonName(btn.Name))
                     {
-                        Button btn = (Button)button;
-
                         if (buttonIndex < pokemonlist.Count)
                         {
                             btn.Data["id"] = pokemonlist[buttonIndex].Id;
                             btn.Data["name"] = pokemonlist[buttonIndex].Name;
                             btn.Sensitive = true;
-                            btn.Image = Pokeball;
 
                             if (VerifyButtonName(btn.Name))
                             {
                                 var pokemon = pokemonlist[buttonIndex];
-                                UpdateButtonImages(btn, pokemon.Id);
+                                //UpdateButtonImages(btn, pokemon.Id);
                             }
 
                             buttonIndex++;
                         }
                         else
                         {
-                            // No more Pokémon to show
                             btn.Sensitive = false;
                             btn.Data["id"] = 0;
                             btn.Data["name"] = "";

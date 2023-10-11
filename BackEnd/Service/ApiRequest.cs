@@ -1,7 +1,6 @@
 ﻿using Gdk;
 using Newtonsoft.Json;
 using PokeApiNet;
-using System.Net;
 using System.Web;
 using Task = System.Threading.Tasks.Task;
 
@@ -52,7 +51,6 @@ namespace PokeApi.BackEnd.Service
                 throw;
             }
         }
-
 
         public async Task<List<Move>> GetMoveLearnedByPokemon(Pokemon pokemon)
         {
