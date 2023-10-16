@@ -182,6 +182,15 @@ namespace PokeApi.BackEnd.Service
 
         public async Task GetPokemonAnimatedSprite(string pokemonName)
         {
+            if (pokemonName == "giratina-altered")
+            {
+                pokemonName = "giratina";
+            }
+            if (pokemonName == "deoxys-normal")
+            {
+                pokemonName = "deoxys";
+            }
+
             string imageUrl = $"https://play.pokemonshowdown.com/sprites/xyani/{pokemonName.ToLower()}.gif";
             string pastaDestino = "Images";
             try
@@ -326,7 +335,9 @@ namespace PokeApi.BackEnd.Service
             {
                 var jsonData = JsonConvert.DeserializeObject<dynamic>(result);
                 var translation = jsonData[0][0][0].ToString();
-                return translation;
+                var removebreakline = translation.Replace("\n", "");
+
+                return removebreakline;
             }
             catch (Exception)
             {

@@ -64,7 +64,7 @@ namespace PokeApi.BackEnd.Service
                             if (VerifyButtonName(btn.Name))
                             {
                                 var pokemon = pokemonlist[buttonIndex];
-                                //UpdateButtonImages(btn, pokemon.Id);
+                                UpdateButtonImages(btn, pokemon.Id);
                             }
 
                             buttonIndex++;
