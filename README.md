@@ -19,14 +19,17 @@ Certifique-se de que você tenha o seguinte software instalado:
 
 - [GTK#](https://github.com/GtkSharp/GtkSharp)
 - [PokeNetApi](https://github.com/jtwotimes/PokeApiNet)
+- [PokeTrainer](https://github.com/Kaaunty/PokeTrainer) 
 
 ## Como Usar
 
-1. Clone este repositório:
+1. Clone este repositório e o repositório da parte do backend da Api:
 
    ```bash
-   git clone https://github.com/seu-usuario/pokedex-gtk-pokenetapi.git](https://github.com/Kaaunty/PokeTrainerAPI.git
-
+   git clone https://github.com/Kaaunty/PokeTrainer.git
+   git clone https://github.com/Kaaunty/PokeTrainerAPI.git
+   
+2. Seja Feliz...
 ## Contribuições
 Contribuições são bem-vindas! Se você deseja aprimorar este projeto, por favor, siga estas etapas:
 
@@ -47,4 +50,4 @@ Se você tiver alguma dúvida ou sugestão, sinta-se à vontade para entrar em c
 
 Aproveite sua Pokédex com GTK# e PokeNetApi! 🌟
 
-<img align="center" alt="coca-anime"  src="https://media.tenor.com/cisq7LCEn0UAAAAC/pokemon-pok%C3%A9mon.gif">
+<img align="center" alt="gengar-licking"  src="https://media.tenor.com/cisq7LCEn0UAAAAC/pokemon-pok%C3%A9mon.gif">
