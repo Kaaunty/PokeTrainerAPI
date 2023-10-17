@@ -2,7 +2,7 @@
 
 ![Pokédex Demo](demo.gif)
 
-Este é um projeto de Pokédex que utiliza o GTK# para criar uma interface gráfica e a API do PokeNetApi para obter informações sobre Pokémon. Com esta aplicação, você pode explorar informações sobre diferentes Pokémon, incluindo seus nomes, tipos, alturas, pesos e imagens.
+👋 Olá... Este é um projeto de Pokédex que utiliza o GTK# para criar uma interface gráfica e a API do PokeNetApi para obter informações sobre Pokémon. Com esta aplicação, você pode explorar informações sobre diferentes Pokémon, incluindo seus nomes, tipos, alturas, pesos e imagens.
 
 ## Demonstração
 
@@ -17,9 +17,8 @@ Para uma demonstração interativa do projeto, assista ao [vídeo de demonstraç
 
 Certifique-se de que você tenha o seguinte software instalado:
 
-- [GTK#](https://mono.github.io/gtk-sharp/)
-- [Mono](https://www.mono-project.com/download/stable/)
-- [PokeNetApi](https://github.com/PokeAPI/pokeapi)
+- [GTK#](https://github.com/GtkSharp/GtkSharp)
+- [PokeNetApi](https://github.com/jtwotimes/PokeApiNet)
 
 ## Como Usar
 
@@ -34,6 +33,7 @@ Contribuições são bem-vindas! Se você deseja aprimorar este projeto, por fav
 Faça um fork deste repositório.
 Crie uma nova branch com sua funcionalidade: git checkout -b minha-funcionalidade
 Faça commit de suas alterações: git commit -m 'Adiciona nova funcionalidade'
+
 Envie suas alterações: git push origin minha-funcionalidade
 Abra um pedido pull request.
 
@@ -42,7 +42,11 @@ Abra um pedido pull request.
 
 Este projeto está licenciado sob a Licença MIT - consulte o arquivo LICENSE para obter detalhes.
 
-##Contato
+Contato
 Se você tiver alguma dúvida ou sugestão, sinta-se à vontade para entrar em contato conosco em [kaaunt5@gmail.com] ou [melissagouveia1306@gmail.com].
 
 Aproveite sua Pokédex com GTK# e PokeNetApi! 🌟
+
+<div>
+<img loading="lazy" height="180em" src="https://media.tenor.com/cisq7LCEn0UAAAAC/pokemon-pok%C3%A9mon.gif"/>
+</div>
