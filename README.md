@@ -47,6 +47,4 @@ Se você tiver alguma dúvida ou sugestão, sinta-se à vontade para entrar em c
 
 Aproveite sua Pokédex com GTK# e PokeNetApi! 🌟
 
-<div>
-<img loading="lazy" height="180em" src="https://media.tenor.com/cisq7LCEn0UAAAAC/pokemon-pok%C3%A9mon.gif"/>
-</div>
+<img align="center" alt="coca-anime"  src="https://media.tenor.com/cisq7LCEn0UAAAAC/pokemon-pok%C3%A9mon.gif">
