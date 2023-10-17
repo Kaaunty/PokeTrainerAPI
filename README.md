@@ -6,7 +6,7 @@
 
 ## Demonstração
 
-Para uma demonstração interativa do projeto, assista ao [vídeo de demonstração](demo.gif).
+<img align="center" alt="poke-trainer"  src="https://i.imgur.com/tMOCD7B.png">
 
 ## Funcionalidades
 
