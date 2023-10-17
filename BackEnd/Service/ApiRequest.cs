@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using PokeApiNet;
 using System.Web;
 using Task = System.Threading.Tasks.Task;
+using Type = PokeApiNet.Type;
 
 namespace PokeApi.BackEnd.Service
 {
@@ -22,6 +23,13 @@ namespace PokeApi.BackEnd.Service
             Pokemon pokemon = await pokeClient.GetResourceAsync<Pokemon>(name);
 
             return pokemon;
+        }
+
+        public async Task<Type> GetTypeAsync(string name)
+        {
+            Type type = await pokeClient.GetResourceAsync<Type>(name);
+
+            return type;
         }
 
         public async Task<List<Pokemon>> GetPokemonsListAll()
@@ -190,6 +198,14 @@ namespace PokeApi.BackEnd.Service
             {
                 pokemonName = "deoxys";
             }
+            if (pokemonName == "charizard-mega-x")
+            {
+                pokemonName = "charizard-megax";
+            }
+            if (pokemonName == "charizard-mega-y")
+            {
+                pokemonName = "charizard-megay";
+            }
 
             string imageUrl = $"https://play.pokemonshowdown.com/sprites/xyani/{pokemonName.ToLower()}.gif";
             string pastaDestino = "Images";
@@ -307,6 +323,19 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
+        public async Task<PokemonForm> GetPokemonForm(string name)
+        {
+            try
+            {
+                PokemonForm pokemonForm = await pokeClient.GetResourceAsync<PokemonForm>(name);
+                return pokemonForm;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<Ability> GetPokemonAbility(string abilityName)
         {
             try
@@ -336,7 +365,14 @@ namespace PokeApi.BackEnd.Service
                 var jsonData = JsonConvert.DeserializeObject<dynamic>(result);
                 var translation = jsonData[0][0][0].ToString();
                 var removebreakline = translation.Replace("\n", "");
-
+                if (removebreakline.Contains("brigando"))
+                {
+                    removebreakline = removebreakline.Replace("brigando", "lutador");
+                }
+                if (removebreakline.Contains("chão"))
+                {
+                    removebreakline = removebreakline.Replace("chão", "terra");
+                }
                 return removebreakline;
             }
             catch (Exception)
