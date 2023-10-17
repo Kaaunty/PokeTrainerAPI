@@ -26,8 +26,7 @@ Certifique-se de que você tenha o seguinte software instalado:
 1. Clone este repositório:
 
    ```bash
-   git clone https://github.com/seu-usuario/pokedex-gtk-pokenetapi.git
-   cd pokedex-gtk-pokenetapi
+   git clone https://github.com/seu-usuario/pokedex-gtk-pokenetapi.git](https://github.com/Kaaunty/PokeTrainerAPI.git
 
 ## Contribuições
 Contribuições são bem-vindas! Se você deseja aprimorar este projeto, por favor, siga estas etapas:
@@ -44,6 +43,6 @@ Abra um pedido pull request.
 Este projeto está licenciado sob a Licença MIT - consulte o arquivo LICENSE para obter detalhes.
 
 ##Contato
-Se você tiver alguma dúvida ou sugestão, sinta-se à vontade para entrar em contato conosco em [kaaunt5@gmail.com].
+Se você tiver alguma dúvida ou sugestão, sinta-se à vontade para entrar em contato conosco em [kaaunt5@gmail.com] ou [melissagouveia1306@gmail.com].
 
 Aproveite sua Pokédex com GTK# e PokeNetApi! 🌟
