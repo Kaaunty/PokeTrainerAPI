@@ -231,6 +231,49 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
+        public async Task GetPokemonShinyAnimatedSprite(string pokemonName)
+        {
+            if (pokemonName == "giratina-altered")
+            {
+                pokemonName = "giratina";
+            }
+            if (pokemonName == "deoxys-normal")
+            {
+                pokemonName = "deoxys";
+            }
+            if (pokemonName == "charizard-mega-x")
+            {
+                pokemonName = "charizard-megax";
+            }
+            if (pokemonName == "charizard-mega-y")
+            {
+                pokemonName = "charizard-megay";
+            }
+
+            string imageUrl = $"https://play.pokemonshowdown.com/sprites/ani-shiny/{pokemonName.ToLower()}.gif";
+            string pastaDestino = "Images";
+            try
+            {
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    byte[] gifBytes = await httpClient.GetByteArrayAsync(imageUrl);
+
+                    if (!Directory.Exists(pastaDestino))
+                    {
+                        Directory.CreateDirectory(pastaDestino);
+                    }
+
+                    string nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
+
+                    File.WriteAllBytes(nomeArquivo, gifBytes);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao carregar a imagem." + ex);
+            }
+        }
+
         public double GetProgress()
         {
             double progress = 0.0;
@@ -364,21 +407,50 @@ namespace PokeApi.BackEnd.Service
             {
                 var jsonData = JsonConvert.DeserializeObject<dynamic>(result);
                 var translation = jsonData[0][0][0].ToString();
-                var removebreakline = translation.Replace("\n", "");
-                if (removebreakline.Contains("brigando"))
+                if (translation.Contains("brigando") || translation.Contains("Luta"))
                 {
-                    removebreakline = removebreakline.Replace("brigando", "lutador");
+                    translation = translation.Replace("brigando", "lutador");
+                    translation = translation.Replace("Luta", "Lutador");
                 }
-                if (removebreakline.Contains("chão"))
+                if (translation.Contains("Solo") || translation.Contains("Chão"))
                 {
-                    removebreakline = removebreakline.Replace("chão", "terra");
+                    translation = translation.Replace("Solo", "Terra");
+                    translation = translation.Replace("Chão", "Terra");
                 }
-                return removebreakline;
+                if (translation.Contains("Bug"))
+                {
+                    translation = translation.Replace("Bug", "Inseto");
+                }
+
+                return translation;
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public List<String> TranslateLists(List<string> input)
+        {
+            var fromLanguage = "en";
+            var toLanguage = "pt-BR";
+            List<String> translatedList = new();
+            foreach (var i in input)
+            {
+                var url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl={fromLanguage}&tl={toLanguage}&dt=t&q={HttpUtility.UrlEncode(i.ToString())}";
+                HttpClient httpClient = new HttpClient();
+                var result = httpClient.GetStringAsync(url).Result;
+                try
+                {
+                    var jsonData = JsonConvert.DeserializeObject<dynamic>(result);
+                    var translation = jsonData[0][0][0].ToString();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            return translatedList;
         }
     }
 }
