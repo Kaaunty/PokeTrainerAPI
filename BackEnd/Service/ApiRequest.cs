@@ -26,7 +26,7 @@ namespace PokeApi.BackEnd.Service
         }
 
         public async Task<Type> GetTypeAsync(string name)
-        {
+         {
             Type type = await pokeClient.GetResourceAsync<Type>(name);
 
             return type;
@@ -121,7 +121,7 @@ namespace PokeApi.BackEnd.Service
                 var pokemonList = PokeList.pokemonList;
 
                 pokemonList = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype) && pokemon.Types.Any(type => type.Slot == 1)).ToList();
-                pokemonList = pokemonList.Skip(currentpage).Take(49).ToList();
+                pokemonList = pokemonList.Skip(currentpage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
@@ -138,7 +138,7 @@ namespace PokeApi.BackEnd.Service
                 var pokemonList = PokeList.pokemonList;
 
                 pokemonList = pokemonList.Where(pokemon => pokemon.Types.Count >= 2 && pokemon.Types[1].Type.Name == lowercasetype).ToList();
-                pokemonList = pokemonList.Skip(currentPage).Take(49).ToList();
+                pokemonList = pokemonList.Skip(currentPage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
