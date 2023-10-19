@@ -1,35 +1,63 @@
-﻿using Gdk;
+﻿using Task = System.Threading.Tasks.Task;
+using Type = PokeApiNet.Type;
 using Newtonsoft.Json;
 using PokeApiNet;
 using System.Web;
-using Task = System.Threading.Tasks.Task;
-using Type = PokeApiNet.Type;
+using Gdk;
 
 namespace PokeApi.BackEnd.Service
 {
     public class ApiRequest
     {
-#nullable disable
+#nullable disable 
+
         private readonly PokeApiClient pokeClient = new PokeApiClient();
 
         public static class PokeList
         {
             public static List<Pokemon> pokemonList = new List<Pokemon>();
-            public static List<Move> pokemonMoves = new List<Move>();
         }
 
         public async Task<Pokemon> GetPokemonAsync(string name)
         {
-            Pokemon pokemon = await pokeClient.GetResourceAsync<Pokemon>(name);
+            try
+            {
+                Pokemon pokemon = await pokeClient.GetResourceAsync<Pokemon>(name);
 
-            return pokemon;
+                return pokemon;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<Type> GetTypeAsync(string name)
-         {
-            Type type = await pokeClient.GetResourceAsync<Type>(name);
+        {
+            try
+            {
+                Type type = await pokeClient.GetResourceAsync<Type>(name);
 
-            return type;
+                return type;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Move>> GetMoveLearnedByPokemon(Pokemon pokemon)
+        {
+            try
+            {
+                List<Move> allMoves = await pokeClient.GetResourceAsync(pokemon.Moves.Select(move => move.Move));
+
+                return allMoves;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<List<Pokemon>> GetPokemonsListAll()
@@ -58,25 +86,6 @@ namespace PokeApi.BackEnd.Service
             {
                 throw;
             }
-        }
-
-        public async Task<List<Move>> GetMoveLearnedByPokemon(Pokemon pokemon)
-        {
-            try
-            {
-                List<Move> allMoves = await pokeClient.GetResourceAsync(pokemon.Moves.Select(move => move.Move));
-                return allMoves;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        private async Task<Move> GetPokemonMoveAsync(string name)
-        {
-            Move move = await pokeClient.GetResourceAsync<Move>(name);
-            return move;
         }
 
         public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
@@ -430,27 +439,27 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public List<String> TranslateLists(List<string> input)
-        {
-            var fromLanguage = "en";
-            var toLanguage = "pt-BR";
-            List<String> translatedList = new();
-            foreach (var i in input)
-            {
-                var url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl={fromLanguage}&tl={toLanguage}&dt=t&q={HttpUtility.UrlEncode(i.ToString())}";
-                HttpClient httpClient = new HttpClient();
-                var result = httpClient.GetStringAsync(url).Result;
-                try
-                {
-                    var jsonData = JsonConvert.DeserializeObject<dynamic>(result);
-                    var translation = jsonData[0][0][0].ToString();
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-            return translatedList;
-        }
+        //public List<String> TranslateLists(List<string> input)
+        //{
+        //    var fromLanguage = "en";
+        //    var toLanguage = "pt-BR";
+        //    List<String> translatedList = new();
+        //    foreach (var i in input)
+        //    {
+        //        var url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl={fromLanguage}&tl={toLanguage}&dt=t&q={HttpUtility.UrlEncode(i.ToString())}";
+        //        HttpClient httpClient = new HttpClient();
+        //        var result = httpClient.GetStringAsync(url).Result;
+        //        try
+        //        {
+        //            var jsonData = JsonConvert.DeserializeObject<dynamic>(result);
+        //            var translation = jsonData[0][0][0].ToString();
+        //        }
+        //        catch (Exception)
+        //        {
+        //            throw;
+        //        }
+        //    }
+        //    return translatedList;
+        //}
     }
 }

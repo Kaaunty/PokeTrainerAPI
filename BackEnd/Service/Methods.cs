@@ -9,8 +9,9 @@ namespace PokeApi.BackEnd.Service
 #nullable disable
 
         private readonly ApiRequest _apiRequest = new();
-        private List<Pokemon> pokemonlist;
+  
         private Image Pokeball = new Image("Images/pokeball.png");
+        private List<Pokemon> pokemonlist;
 
         public void Initialize(int currentPage, string type, int choice)
         {
@@ -30,10 +31,6 @@ namespace PokeApi.BackEnd.Service
             else if (choice == 2)
             {
                 pokemonlist = _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
-            }
-            else if (choice == 3)
-            {
-                pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
             }
         }
 
