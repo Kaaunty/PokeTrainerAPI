@@ -12,10 +12,12 @@ namespace PokeApi.BackEnd.Service
 #nullable disable 
 
         private readonly PokeApiClient pokeClient = new PokeApiClient();
+        private Move move;
 
         public static class PokeList
         {
             public static List<Pokemon> pokemonList = new List<Pokemon>();
+            public static List<Move> pokemonMoveList = new List<Move>();
         }
 
         public async Task<Pokemon> GetPokemonAsync(string name)
@@ -87,6 +89,7 @@ namespace PokeApi.BackEnd.Service
                 throw;
             }
         }
+         
 
         public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
         {
@@ -381,6 +384,23 @@ namespace PokeApi.BackEnd.Service
             {
                 PokemonForm pokemonForm = await pokeClient.GetResourceAsync<PokemonForm>(name);
                 return pokemonForm;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<MoveLearnMethod> GetMoveLearnMethod(string moveName)
+        {
+            try
+            {
+                MoveLearnMethod moveLearnMethod = await pokeClient.GetResourceAsync<MoveLearnMethod>(moveName);
+                if (moveLearnMethod != null)
+                {
+                    return moveLearnMethod;
+                }
+                return null;
             }
             catch (Exception)
             {
