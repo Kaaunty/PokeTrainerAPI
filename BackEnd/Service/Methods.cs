@@ -1,21 +1,17 @@
-﻿using Gdk;
+﻿using PokeApiNet;
+using Gdk;
 using Gtk;
-using PokeApiNet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PokeApi.BackEnd.Service
 {
     public class Methods
     {
 #nullable disable
+
         private readonly ApiRequest _apiRequest = new();
-        private List<Pokemon> pokemonlist;
+  
         private Image Pokeball = new Image("Images/pokeball.png");
+        private List<Pokemon> pokemonlist;
 
         public void Initialize(int currentPage, string type, int choice)
         {
@@ -41,6 +37,7 @@ namespace PokeApi.BackEnd.Service
                 pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
             }
         }
+
 
         public void UpdateButtons(Fixed fix, int currentPage, string type, int choice)
         {
@@ -245,110 +242,6 @@ namespace PokeApi.BackEnd.Service
                 return true;
             }
             if (name == "pokemon25")
-            {
-                return true;
-            }
-            if (name == "pokemon26")
-            {
-                return true;
-            }
-            if (name == "pokemon27")
-            {
-                return true;
-            }
-            if (name == "pokemon28")
-            {
-                return true;
-            }
-            if (name == "pokemon29")
-            {
-                return true;
-            }
-            if (name == "pokemon30")
-            {
-                return true;
-            }
-            if (name == "pokemon31")
-            {
-                return true;
-            }
-            if (name == "pokemon32")
-            {
-                return true;
-            }
-            if (name == "pokemon33")
-            {
-                return true;
-            }
-            if (name == "pokemon34")
-            {
-                return true;
-            }
-            if (name == "pokemon35")
-            {
-                return true;
-            }
-            if (name == "pokemon36")
-            {
-                return true;
-            }
-            if (name == "pokemon37")
-            {
-                return true;
-            }
-            if (name == "pokemon38")
-            {
-                return true;
-            }
-            if (name == "pokemon39")
-            {
-                return true;
-            }
-            if (name == "pokemon40")
-            {
-                return true;
-            }
-            if (name == "pokemon41")
-            {
-                return true;
-            }
-            if (name == "pokemon42")
-            {
-                return true;
-            }
-            if (name == "pokemon43")
-            {
-                return true;
-            }
-            if (name == "pokemon44")
-            {
-                return true;
-            }
-            if (name == "pokemon45")
-            {
-                return true;
-            }
-            if (name == "pokemon46")
-            {
-                return true;
-            }
-            if (name == "pokemon47")
-            {
-                return true;
-            }
-            if (name == "pokemon48")
-            {
-                return true;
-            }
-            if (name == "pokemon49")
-            {
-                return true;
-            }
-            if (name == "pokemon50")
-            {
-                return true;
-            }
-            if (name == "pokemon51")
             {
                 return true;
             }
