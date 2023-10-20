@@ -129,14 +129,14 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        private void UpdateButtonImages(Button button, int id)
+        private async void UpdateButtonImages(Button button, int id)
         {
             Image pokeimage = new Image();
 
-            Pixbuf pokemonImage = _apiRequest.LoadPokemonSprite(id);
+            Pixbuf pokemonImage = await _apiRequest.LoadPokemonSprite(id);
             if (pokemonImage != null)
             {
-                pokemonImage = pokemonImage.ScaleSimple(40, 40, InterpType.Bilinear);
+                pokemonImage = pokemonImage.ScaleSimple(50, 50, InterpType.Bilinear);
                 pokeimage.Pixbuf = pokemonImage;
             }
 
