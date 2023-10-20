@@ -32,7 +32,12 @@ namespace PokeApi.BackEnd.Service
             {
                 pokemonlist = _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
             }
+            else if (choice == 3)
+            {
+                pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
+            }
         }
+
 
         public void UpdateButtons(Fixed fix, int currentPage, string type, int choice)
         {
