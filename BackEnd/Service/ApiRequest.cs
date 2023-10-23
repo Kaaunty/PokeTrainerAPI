@@ -1,6 +1,6 @@
 using Gtk;
 
-﻿using Task = System.Threading.Tasks.Task;
+using Task = System.Threading.Tasks.Task;
 using Type = PokeApiNet.Type;
 using Newtonsoft.Json;
 using PokeApiNet;
@@ -11,7 +11,7 @@ namespace PokeApi.BackEnd.Service
 {
     public class ApiRequest
     {
-#nullable disable 
+#nullable disable
 
         private readonly PokeApiClient pokeClient = new PokeApiClient();
         private Move move;
@@ -23,7 +23,6 @@ namespace PokeApi.BackEnd.Service
             public static List<Move> pokemonMoves = new List<Move>();
             public static Dictionary<int, Pixbuf> _pokemonImageCache = new Dictionary<int, Pixbuf>();
             public static Dictionary<string, string> TypeDamageRelations = new();
-=======
             public static List<Move> pokemonMoveList = new List<Move>();
         }
 
@@ -124,16 +123,7 @@ namespace PokeApi.BackEnd.Service
                 name = "unknown";
             }
             Type type = await pokeClient.GetResourceAsync<Type>(name);
-            try
-            {
-                Type type = await pokeClient.GetResourceAsync<Type>(name);
-
-                return type;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return type;
         }
 
         public async Task<List<Move>> GetMoveLearnedByPokemon(Pokemon pokemon)
@@ -177,7 +167,6 @@ namespace PokeApi.BackEnd.Service
                 throw;
             }
         }
-         
 
         public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
         {
