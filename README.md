@@ -1,7 +1,4 @@
 # Pokédex com GTK# e PokeNetApi
-
-![Pokédex Demo](demo.gif)
-
 👋 Saudações! Bem-vindo a este emocionante projeto de Pokédex que faz uso do GTK# para fornecer uma interface gráfica incrível e se conecta à API do PokeNetApi para acessar detalhes abrangentes sobre Pokémon. Com esta aplicação, você poderá mergulhar no vasto mundo dos Pokémon, explorando algumas de suas informações, como seus nomes, tipos, alturas, pesos e visualizando suas imagens. Prepare-se para uma jornada de descobertas Pokémon! 🌟
 
 ## Demonstração
