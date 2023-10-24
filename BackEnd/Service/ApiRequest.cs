@@ -1,17 +1,10 @@
-using Task = System.Threading.Tasks.Task;
-using Type = PokeApiNet.Type;
+using Gdk;
 using Newtonsoft.Json;
 using PokeApiNet;
-using System;
 using System.Web;
-
-using Gdk;
-
-using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 using Type = PokeApiNet.Type;
-
 
 namespace PokeApi.BackEnd.Service
 {
@@ -609,7 +602,7 @@ namespace PokeApi.BackEnd.Service
                     File.WriteAllBytes(nomeArquivo, gifBytes);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("Erro ao carregar a imagem.");
                 Console.WriteLine("Tentando carregar a imagem estática.");
