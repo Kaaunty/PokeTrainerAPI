@@ -9,7 +9,7 @@ namespace PokeApi.BackEnd.Service
 #nullable disable
 
         private readonly ApiRequest _apiRequest = new();
-  
+
         private Image Pokeball = new Image("Images/pokeball.png");
         private List<Pokemon> pokemonlist;
 
@@ -37,7 +37,6 @@ namespace PokeApi.BackEnd.Service
                 pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
             }
         }
-
 
         public void UpdateButtons(Fixed fix, int currentPage, string type, int choice)
         {
@@ -136,7 +135,13 @@ namespace PokeApi.BackEnd.Service
                 pokemonImage = pokemonImage.ScaleSimple(50, 50, InterpType.Bilinear);
                 pokeimage.Pixbuf = pokemonImage;
             }
-
+            if (pokemonImage == null)
+            {
+                pokemonImage = new Pixbuf("Images/pokemonerror.png");
+                pokemonImage = pokemonImage.ScaleSimple(50, 50, InterpType.Bilinear);
+                pokeimage.Pixbuf = pokemonImage;
+                button.Image = pokeimage;
+            }
             if (pokeimage != null)
             {
                 button.Image = pokeimage;
