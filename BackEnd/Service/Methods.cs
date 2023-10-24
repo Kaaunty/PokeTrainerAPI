@@ -38,7 +38,6 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-
         public void UpdateButtons(Fixed fix, int currentPage, string type, int choice)
         {
             Initialize(currentPage, type, choice);
@@ -248,5 +247,7 @@ namespace PokeApi.BackEnd.Service
 
             return false;
         }
+
+       
     }
 }

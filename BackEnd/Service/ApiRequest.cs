@@ -129,7 +129,6 @@ namespace PokeApi.BackEnd.Service
             try
             {
                 List<Move> allMoves = await pokeClient.GetResourceAsync(pokemon.Moves.Select(move => move.Move));
-
                 return allMoves;
             }
             catch (Exception)
