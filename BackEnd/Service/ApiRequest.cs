@@ -1,9 +1,9 @@
-using Gdk;
+using Task = System.Threading.Tasks.Task;
+using Type = PokeApiNet.Type;
 using Newtonsoft.Json;
 using PokeApiNet;
 using System.Web;
-using Task = System.Threading.Tasks.Task;
-using Type = PokeApiNet.Type;
+using Gdk;
 
 namespace PokeApi.BackEnd.Service
 {
@@ -12,12 +12,12 @@ namespace PokeApi.BackEnd.Service
 #nullable disable
 
         private readonly PokeApiClient pokeClient = new PokeApiClient();
-        private Move move;
+
+        private EvolutionChain evolutionChain;
 
         public static class PokeList
         {
             public static List<Pokemon> pokemonList = new List<Pokemon>();
-
             public static List<Move> pokemonMoves = new List<Move>();
             public static Dictionary<int, Pixbuf> _pokemonImageCache = new Dictionary<int, Pixbuf>();
             public static Dictionary<string, string> TypeDamageRelations = new();
