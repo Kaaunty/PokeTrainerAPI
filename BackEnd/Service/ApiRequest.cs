@@ -1,7 +1,10 @@
 using Gdk;
 using Newtonsoft.Json;
 using PokeApiNet;
+using System;
 using System.Web;
+using static System.Net.WebRequestMethods;
+using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 using Type = PokeApiNet.Type;
 
@@ -141,28 +144,41 @@ namespace PokeApi.BackEnd.Service
         {
             bool hasEmptyResults;
             int currentPage = 0;
-            try
-            {
-                do
-                {
-                    int totalpokemoncount = 200;
-                    var page = await pokeClient.GetNamedResourcePageAsync<Pokemon>(totalpokemoncount, currentPage);
-                    var tasks = page.Results.Select(result => GetPokemonAsync(result.Name)).ToList();
-                    hasEmptyResults = tasks.Count == 0;
+            int maxRetries = 3;
 
-                    if (!hasEmptyResults)
-                    {
-                        await Task.WhenAll(tasks);
-                        PokeList.pokemonList.AddRange(tasks.Select(task => task.Result));
-                        currentPage += 200;
-                    }
-                } while (!hasEmptyResults);
-                return PokeList.pokemonList;
-            }
-            catch (Exception)
+            for (int retry = 0; retry < maxRetries; retry++)
             {
-                throw;
+                try
+                {
+                    do
+                    {
+                        int totalpokemoncount = 200;
+                        var page = await pokeClient.GetNamedResourcePageAsync<Pokemon>(totalpokemoncount, currentPage);
+                        var tasks = page.Results.Select(result => GetPokemonAsync(result.Name)).ToList();
+                        hasEmptyResults = tasks.Count == 0;
+
+                        if (!hasEmptyResults)
+                        {
+                            await Task.WhenAll(tasks);
+                            PokeList.pokemonList.AddRange(tasks.Select(task => task.Result));
+                            currentPage += 200;
+                        }
+                    } while (!hasEmptyResults);
+
+                    return PokeList.pokemonList;
+                }
+                catch (Exception ex)
+                {
+                    if (retry < maxRetries - 1)
+                    {
+                        Console.Write(ex.Message);
+                        // Em caso de exceção, aguarde um curto período de tempo (opcional)
+                        await Task.Delay(1000);
+                    }
+                }
             }
+
+            throw new Exception("Falha após várias tentativas"); // Lança uma exceção após várias tentativas
         }
 
         public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
@@ -268,22 +284,34 @@ namespace PokeApi.BackEnd.Service
                 {
                     url = poke.Sprites.Versions.GenerationVII.Icons.FrontDefault;
                 }
-                if (pokemonName.Contains("ogerpon"))
+                if (url == null)
                 {
-                    if (pokemonName.Contains("wellspring-mask"))
-                    {
-                        url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1017.png";
-                    }
-                    else if (pokemonName.Contains("hearthflame-mask"))
-                    {
-                        url = "https://archives.bulbagarden.net/media/upload/e/eb/HOME1017H.png";
-                    }
-                    else if (pokemonName.Contains("cornerstone-mask"))
-                    {
-                        url = "https://archives.bulbagarden.net/media/upload/9/92/HOME1017W.png";
-                    }
+                    url = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName}.png";
                 }
-
+                if (pokemonName.Contains("koraidon"))
+                {
+                    url = "https://play.pokemonshowdown.com/sprites/gen5/koraidon.png";
+                }
+                if (pokemonName.Contains("-totem"))
+                {
+                    url = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName.Replace("-totem", "")}.png";
+                }
+                if (pokemonName.Contains("kommo-o-totem"))
+                {
+                    url = "https://play.pokemonshowdown.com/sprites/gen5/kommoo.png";
+                }
+                if (pokemonName == "pikachu-world-cap")
+                {
+                    url = "https://play.pokemonshowdown.com/sprites/gen5/pikachu-world.png";
+                }
+                if (pokemonName.Contains("miraidon"))
+                {
+                    url = "https://play.pokemonshowdown.com/sprites/gen5/miraidon.png";
+                }
+                if (pokemonName.Contains("koraidon"))
+                {
+                    url = "https://play.pokemonshowdown.com/sprites/gen5/koraidon.png";
+                }
                 try
                 {
                     HttpClient httpClient = new HttpClient();
@@ -312,7 +340,7 @@ namespace PokeApi.BackEnd.Service
 
         public async Task GetPokemonAnimatedSprite(string pokemonName)
         {
-            string imageUrl;
+            string imageUrl = "";
             if (pokemonName == "giratina-altered")
             {
                 pokemonName = "giratina";
@@ -365,6 +393,150 @@ namespace PokeApi.BackEnd.Service
                     }
 
                     string nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimated.gif");
+
+                    File.WriteAllBytes(nomeArquivo, gifBytes);
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Erro ao carregar a imagem.");
+                Console.WriteLine("Tentando carregar a imagem estática.");
+                await GetPokemonStaticSprite(pokemonName);
+            }
+        }
+
+        public async Task GetPokemonStaticSprite(string pokemonName)
+        {
+            #region if's name validation
+
+            if (pokemonName == "giratina-altered")
+            {
+                pokemonName = "giratina";
+            }
+            if (pokemonName.Contains("mega-y"))
+            {
+                pokemonName = pokemonName.Replace("mega-y", "megay");
+            }
+            if (pokemonName.Contains("mega-x"))
+            {
+                pokemonName = pokemonName.Replace("mega-x", "megax");
+            }
+            if (pokemonName.Contains("-natural"))
+            {
+                pokemonName = pokemonName.Replace("-natural", "");
+            }
+            if (pokemonName.Contains("-normal"))
+            {
+                pokemonName = pokemonName.Replace("-normal", "");
+            }
+            if (pokemonName.Contains("koraidon"))
+            {
+                pokemonName = pokemonName.Replace(pokemonName, "koraidon");
+            }
+            if (pokemonName.Contains("miraidon"))
+            {
+                pokemonName = pokemonName.Replace(pokemonName, "miraidon");
+            }
+            if (pokemonName == "tauros-paldea-combat-breed")
+            {
+                pokemonName = "tauros-paldeacombat";
+            }
+            if (pokemonName == "tauros-paldea-blaze-breed")
+            {
+                pokemonName = "tauros-paldeablaze";
+            }
+            if (pokemonName == "tauros-paldea-aqua-breed")
+            {
+                pokemonName = "tauros-paldeaaqua";
+            }
+
+            #endregion if's name validation
+
+            string imageUrl = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName.ToLower()}.png";
+            string pastaDestino = "Images";
+            try
+            {
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    byte[] gifBytes = await httpClient.GetByteArrayAsync(imageUrl);
+
+                    if (!Directory.Exists(pastaDestino))
+                    {
+                        Directory.CreateDirectory(pastaDestino);
+                    }
+
+                    string nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimated.gif");
+
+                    File.WriteAllBytes(nomeArquivo, gifBytes);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao carregar a imagem." + ex);
+            }
+        }
+
+        public async Task GetPokemonStaticShinySprite(string pokemonName)
+        {
+            #region if's name validation
+
+            if (pokemonName == "giratina-altered")
+            {
+                pokemonName = "giratina";
+            }
+            if (pokemonName.Contains("mega-y"))
+            {
+                pokemonName = pokemonName.Replace("mega-y", "megay");
+            }
+            if (pokemonName.Contains("mega-x"))
+            {
+                pokemonName = pokemonName.Replace("mega-x", "megax");
+            }
+            if (pokemonName.Contains("-natural"))
+            {
+                pokemonName = pokemonName.Replace("-natural", "");
+            }
+            if (pokemonName.Contains("-normal"))
+            {
+                pokemonName = pokemonName.Replace("-normal", "");
+            }
+            if (pokemonName.Contains("koraidon"))
+            {
+                pokemonName = pokemonName.Replace(pokemonName, "koraidon");
+            }
+            if (pokemonName.Contains("miraidon"))
+            {
+                pokemonName = pokemonName.Replace(pokemonName, "miraidon");
+            }
+            if (pokemonName == "tauros-paldea-combat-breed")
+            {
+                pokemonName = "tauros-paldeacombat";
+            }
+            if (pokemonName == "tauros-paldea-blaze-breed")
+            {
+                pokemonName = "tauros-paldeablaze";
+            }
+            if (pokemonName == "tauros-paldea-aqua-breed")
+            {
+                pokemonName = "tauros-paldeaaqua";
+            }
+
+            #endregion if's name validation
+
+            string imageUrl = $"https://play.pokemonshowdown.com/sprites/gen5-shiny/{pokemonName.ToLower()}.png";
+            string pastaDestino = "Images";
+            try
+            {
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    byte[] gifBytes = await httpClient.GetByteArrayAsync(imageUrl);
+
+                    if (!Directory.Exists(pastaDestino))
+                    {
+                        Directory.CreateDirectory(pastaDestino);
+                    }
+
+                    string nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
 
                     File.WriteAllBytes(nomeArquivo, gifBytes);
                 }
@@ -434,7 +606,9 @@ namespace PokeApi.BackEnd.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Erro ao carregar a imagem." + ex);
+                Console.WriteLine("Erro ao carregar a imagem.");
+                Console.WriteLine("Tentando carregar a imagem estática.");
+                await GetPokemonStaticShinySprite(pokemonName);
             }
         }
 
