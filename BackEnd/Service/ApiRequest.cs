@@ -1,12 +1,17 @@
-using Gdk;
+using Task = System.Threading.Tasks.Task;
+using Type = PokeApiNet.Type;
 using Newtonsoft.Json;
 using PokeApiNet;
 using System;
 using System.Web;
+
+using Gdk;
+
 using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 using Type = PokeApiNet.Type;
+
 
 namespace PokeApi.BackEnd.Service
 {
@@ -15,12 +20,12 @@ namespace PokeApi.BackEnd.Service
 #nullable disable
 
         private readonly PokeApiClient pokeClient = new PokeApiClient();
-        private Move move;
+
+        private EvolutionChain evolutionChain;
 
         public static class PokeList
         {
             public static List<Pokemon> pokemonList = new List<Pokemon>();
-
             public static List<Move> pokemonMoves = new List<Move>();
             public static Dictionary<int, Pixbuf> _pokemonImageCache = new Dictionary<int, Pixbuf>();
             public static Dictionary<string, string> TypeDamageRelations = new();
@@ -172,13 +177,13 @@ namespace PokeApi.BackEnd.Service
                     if (retry < maxRetries - 1)
                     {
                         Console.Write(ex.Message);
-                        // Em caso de exceção, aguarde um curto período de tempo (opcional)
+                        // Em caso de exceÃ§Ã£o, aguarde um curto perÃ­odo de tempo (opcional)
                         await Task.Delay(1000);
                     }
                 }
             }
 
-            throw new Exception("Falha após várias tentativas"); // Lança uma exceção após várias tentativas
+            throw new Exception("Falha apÃ³s vÃ¡rias tentativas"); // LanÃ§a uma exceÃ§Ã£o apÃ³s vÃ¡rias tentativas
         }
 
         public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
@@ -400,7 +405,7 @@ namespace PokeApi.BackEnd.Service
             catch (Exception)
             {
                 Console.WriteLine("Erro ao carregar a imagem.");
-                Console.WriteLine("Tentando carregar a imagem estática.");
+                Console.WriteLine("Tentando carregar a imagem estÃ¡tica.");
                 await GetPokemonStaticSprite(pokemonName);
             }
         }
@@ -607,7 +612,7 @@ namespace PokeApi.BackEnd.Service
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao carregar a imagem.");
-                Console.WriteLine("Tentando carregar a imagem estática.");
+                Console.WriteLine("Tentando carregar a imagem estÃ¡tica.");
                 await GetPokemonStaticShinySprite(pokemonName);
             }
         }
