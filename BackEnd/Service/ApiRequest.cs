@@ -1,17 +1,10 @@
-using Task = System.Threading.Tasks.Task;
-using Type = PokeApiNet.Type;
+using Gdk;
 using Newtonsoft.Json;
 using PokeApiNet;
-using System;
 using System.Web;
-
-using Gdk;
-
-using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 using Type = PokeApiNet.Type;
-
 
 namespace PokeApi.BackEnd.Service
 {
@@ -343,9 +336,12 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public async Task GetPokemonAnimatedSprite(string pokemonName)
+        public async Task GetPokemonAnimatedSprite(string pokemonName, bool shiny)
         {
             string imageUrl = "";
+
+            #region if's
+
             if (pokemonName == "giratina-altered")
             {
                 pokemonName = "giratina";
@@ -382,10 +378,56 @@ namespace PokeApi.BackEnd.Service
             {
                 pokemonName = pokemonName.Replace("la-reine", "lareine");
             }
+            else if (pokemonName.Contains("necrozma-dusk"))
+            {
+                pokemonName = pokemonName.Replace("dusk", "duskmane");
+            }
+            else if (pokemonName.Contains("necrozma-dawn"))
+            {
+                pokemonName = pokemonName.Replace("dawn", "dawnwings");
+            }
+            else if (pokemonName.Contains("necrozma-dusk"))
+            {
+                pokemonName = pokemonName.Replace("dusk", "duskmane");
+            }
+            else if (pokemonName.Contains("oinkologne-female"))
+            {
+                pokemonName = pokemonName.Replace("-female", "-f");
+            }
+            else if (pokemonName.Contains("plumage"))
+            {
+                pokemonName = pokemonName.Replace("-plumage", "");
+            }
+            else if (pokemonName.Contains("family-of-three"))
+            {
+                pokemonName = pokemonName.Replace("family-of-three", "four");
+            }
+            else if (pokemonName.Contains("disguised"))
+            {
+                pokemonName = pokemonName.Replace("-disguised", "");
+            }
+            else if (pokemonName.Contains("totem-busted"))
+            {
+                pokemonName = pokemonName.Replace("totem-busted", "busted-totem");
+            }
+            else if (pokemonName.Contains("nidoran-m"))
+            {
+                pokemonName = pokemonName.Replace("-m", "");
+            }
 
-            imageUrl = $"https://play.pokemonshowdown.com/sprites/xyani/{pokemonName.ToLower()}.gif";
+            #endregion if's
+
+            if (shiny)
+            {
+                imageUrl = $"https://play.pokemonshowdown.com/sprites/ani-shiny/{pokemonName.ToLower()}.gif";
+            }
+            else
+            {
+                imageUrl = $"https://play.pokemonshowdown.com/sprites/xyani/{pokemonName.ToLower()}.gif";
+            }
 
             string pastaDestino = "Images";
+            string nomeArquivo = "";
             try
             {
                 using (HttpClient httpClient = new HttpClient())
@@ -396,8 +438,14 @@ namespace PokeApi.BackEnd.Service
                     {
                         Directory.CreateDirectory(pastaDestino);
                     }
-
-                    string nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimated.gif");
+                    if (shiny)
+                    {
+                        nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
+                    }
+                    else
+                    {
+                        nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimated.gif");
+                    }
 
                     File.WriteAllBytes(nomeArquivo, gifBytes);
                 }
@@ -552,70 +600,101 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public async Task GetPokemonShinyAnimatedSprite(string pokemonName)
-        {
-            if (pokemonName == "giratina-altered")
-            {
-                pokemonName = "giratina";
-            }
-            if (pokemonName.Contains("mega-y"))
-            {
-                pokemonName = pokemonName.Replace("mega-y", "megay");
-            }
-            if (pokemonName.Contains("mega-x"))
-            {
-                pokemonName = pokemonName.Replace("mega-x", "megax");
-            }
-            if (pokemonName.Contains("-natural"))
-            {
-                pokemonName = pokemonName.Replace("-natural", "");
-            }
-            if (pokemonName.Contains("-normal"))
-            {
-                pokemonName = pokemonName.Replace("-normal", "");
-            }
-            else if (pokemonName.Contains("amped-gmax"))
-            {
-                pokemonName = pokemonName.Replace("amped-gmax", "gmax");
-            }
-            else if (pokemonName.Contains("-low-key"))
-            {
-                pokemonName = pokemonName.Replace("-low-key", "-lowkey");
-            }
-            else if (pokemonName.Contains("toxtricity-amped"))
-            {
-                pokemonName = pokemonName.Replace("toxtricity-amped", "toxtricity");
-            }
-            else if (pokemonName.Contains("furfrou-la-reine"))
-            {
-                pokemonName = pokemonName.Replace("la-reine", "lareine");
-            }
+        //public async Task GetPokemonShinyAnimatedSprite(string pokemonName)
+        //{
+        //    if (pokemonName == "giratina-altered")
+        //    {
+        //        pokemonName = "giratina";
+        //    }
+        //    else if (pokemonName.Contains("mega-y"))
+        //    {
+        //        pokemonName = pokemonName.Replace("mega-y", "megay");
+        //    }
+        //    else if (pokemonName.Contains("mega-x"))
+        //    {
+        //        pokemonName = pokemonName.Replace("mega-x", "megax");
+        //    }
+        //    else if (pokemonName.Contains("-natural"))
+        //    {
+        //        pokemonName = pokemonName.Replace("-natural", "");
+        //    }
+        //    else if (pokemonName.Contains("-normal"))
+        //    {
+        //        pokemonName = pokemonName.Replace("-normal", "");
+        //    }
+        //    else if (pokemonName.Contains("amped-gmax"))
+        //    {
+        //        pokemonName = pokemonName.Replace("amped-gmax", "gmax");
+        //    }
+        //    else if (pokemonName.Contains("-low-key"))
+        //    {
+        //        pokemonName = pokemonName.Replace("-low-key", "-lowkey");
+        //    }
+        //    else if (pokemonName.Contains("toxtricity-amped"))
+        //    {
+        //        pokemonName = pokemonName.Replace("toxtricity-amped", "toxtricity");
+        //    }
+        //    else if (pokemonName.Contains("furfrou-la-reine"))
+        //    {
+        //        pokemonName = pokemonName.Replace("la-reine", "lareine");
+        //    }
+        //    else if (pokemonName.Contains("necrozma-dusk"))
+        //    {
+        //        pokemonName = pokemonName.Replace("dusk", "duskmane");
+        //    }
+        //    else if (pokemonName.Contains("necrozma-dawn"))
+        //    {
+        //        pokemonName = pokemonName.Replace("dawn", "dawnwings");
+        //    }
+        //    else if (pokemonName.Contains("necrozma-dusk"))
+        //    {
+        //        pokemonName = pokemonName.Replace("dusk", "duskmane");
+        //    }
+        //    else if (pokemonName.Contains("oinkologne-female"))
+        //    {
+        //        pokemonName = pokemonName.Replace("-female", "-f");
+        //    }
+        //    else if (pokemonName.Contains("plumage"))
+        //    {
+        //        pokemonName = pokemonName.Replace("-plumage", "");
+        //    }
+        //    else if (pokemonName.Contains("family-of-three"))
+        //    {
+        //        pokemonName = pokemonName.Replace("family-of-three", "four");
+        //    }
+        //    else if (pokemonName.Contains("disguised"))
+        //    {
+        //        pokemonName = pokemonName.Replace("-disguised", "");
+        //    }
+        //    else if (pokemonName.Contains("totem-busted"))
+        //    {
+        //        pokemonName = pokemonName.Replace("totem-busted", "busted-totem");
+        //    }
+        //    string imageUrl = $"https://play.pokemonshowdown.com/sprites/ani-shiny/{pokemonName.ToLower()}.gif";
+        //    string pastaDestino = "Images";
+        //    try
+        //    {
+        //        using (HttpClient httpClient = new HttpClient())
+        //        {
+        //            byte[] gifBytes = await httpClient.GetByteArrayAsync(imageUrl);
 
-            string imageUrl = $"https://play.pokemonshowdown.com/sprites/ani-shiny/{pokemonName.ToLower()}.gif";
-            string pastaDestino = "Images";
-            try
-            {
-                using (HttpClient httpClient = new HttpClient())
-                {
-                    byte[] gifBytes = await httpClient.GetByteArrayAsync(imageUrl);
+        //            if (!Directory.Exists(pastaDestino))
+        //            {
+        //                Directory.CreateDirectory(pastaDestino);
+        //            }
 
-                    if (!Directory.Exists(pastaDestino))
-                    {
-                        Directory.CreateDirectory(pastaDestino);
-                    }
+        //            string nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
 
-                    string nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
-
-                    File.WriteAllBytes(nomeArquivo, gifBytes);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao carregar a imagem.");
-                Console.WriteLine("Tentando carregar a imagem estática.");
-                await GetPokemonStaticShinySprite(pokemonName);
-            }
-        }
+        //            File.WriteAllBytes(nomeArquivo, gifBytes);
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        Console.WriteLine("Erro ao carregar a imagem.");
+        //        Console.WriteLine("Tentando carregar a imagem estática.");
+        //        await GetPokemonStaticShinySprite(pokemonName);
+        //    }
+        //}
 
         public double GetProgress()
         {
@@ -770,6 +849,48 @@ namespace PokeApi.BackEnd.Service
 
                 string removebreaklines = translation.Replace("\n", " ");
                 translation = removebreaklines.Replace(". ", ".");
+                return translation;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public string TranslateType(string input)
+        {
+            var fromLanguage = "en";
+            var toLanguage = "pt-BR";
+            var url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl={fromLanguage}&tl={toLanguage}&dt=t&q={HttpUtility.UrlEncode(input)}";
+            HttpClient httpClient = new HttpClient();
+            var result = httpClient.GetStringAsync(url).Result;
+            try
+            {
+                var jsonData = JsonConvert.DeserializeObject<dynamic>(result);
+                var translation = jsonData[0][0][0].ToString();
+
+                string removebreaklines = translation.Replace("\n", " ");
+                translation = removebreaklines.Replace(". ", ".");
+                if (translation == "Chão")
+                {
+                    translation = "Terra";
+                }
+                else if (translation == "Aço")
+                {
+                    translation = "Metal";
+                }
+                else if (translation == "Brigando")
+                {
+                    translation = "Lutador";
+                }
+                else if (translation == "Escuro")
+                {
+                    translation = "Noturno";
+                }
+                else if (translation == "Vôo")
+                {
+                    translation = "Voador";
+                }
                 return translation;
             }
             catch (Exception)
