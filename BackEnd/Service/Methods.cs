@@ -1,6 +1,6 @@
-﻿using PokeApiNet;
-using Gdk;
+﻿using Gdk;
 using Gtk;
+using PokeApiNet;
 
 namespace PokeApi.BackEnd.Service
 {
@@ -11,7 +11,7 @@ namespace PokeApi.BackEnd.Service
         private readonly ApiRequest _apiRequest = new();
 
         private Image Pokeball = new Image("Images/pokeball.png");
-        private List<Pokemon> pokemonlist;
+        private List<Pokemon> pokemonlist = new List<Pokemon>();
 
         public void Initialize(int currentPage, string type, int choice)
         {
@@ -41,7 +41,6 @@ namespace PokeApi.BackEnd.Service
         public void UpdateButtons(Fixed fix, int currentPage, string type, int choice)
         {
             Initialize(currentPage, type, choice);
-            Pokeball = new Image("Images/pokeball.png");
             int buttonIndex = 0;
 
             foreach (var button in fix.AllChildren)
@@ -254,6 +253,15 @@ namespace PokeApi.BackEnd.Service
             return false;
         }
 
-       
+        public void DisableButtons(Button btn)
+        {
+            if (pokemonlist != null)
+            {
+                if (pokemonlist.Count < 25)
+                {
+                    btn.Sensitive = false;
+                }
+            }
+        }
     }
 }
