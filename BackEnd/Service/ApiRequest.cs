@@ -1,18 +1,21 @@
 using Gdk;
 using Newtonsoft.Json;
 using PokeApiNet;
+using System.Net;
 using System.Web;
+using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 using Type = PokeApiNet.Type;
 
 namespace PokeApi.BackEnd.Service
 {
-    public class ApiRequest
+    public class ApiRequest : IApiRequests
     {
 #nullable disable
 
         private readonly PokeApiClient pokeClient = new PokeApiClient();
+        private HttpClient httpClient = new HttpClient();
 
         public static class PokeList
         {
@@ -23,15 +26,36 @@ namespace PokeApi.BackEnd.Service
             public static List<Move> pokemonMoveList = new List<Move>();
         }
 
-        public async Task<Pokemon> GetPokemonAsync(string name)
+        public async Task<Pokemon> GetPokemon(string name)
         {
+            if (name == "mimikyu")
+            {
+                name = "mimikyu-disguised";
+            }
+            string url = $"https://pokeapi.co/api/v2/pokemon/{name}";
             try
             {
-                Pokemon pokemon = await pokeClient.GetResourceAsync<Pokemon>(name);
-                return pokemon;
+                var response = await httpClient.GetAsync(url);
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                {
+                    await Task.Delay(1000);
+                    return await GetPokemon(name);
+                }
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    Pokemon pokemon = JsonConvert.DeserializeObject<Pokemon>(json);
+                    return pokemon;
+                }
+                return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine("Erro ao carregar o pokemon." + ex);
                 throw;
             }
         }
@@ -118,8 +142,32 @@ namespace PokeApi.BackEnd.Service
             {
                 name = "unknown";
             }
-            Type type = await pokeClient.GetResourceAsync<Type>(name);
-            return type;
+
+            string url = $"https://pokeapi.co/api/v2/type/{name}";
+            try
+            {
+                var response = await httpClient.GetAsync(url);
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                {
+                    await Task.Delay(1000);
+                    return await GetTypeAsync(name);
+                }
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    Type type = JsonConvert.DeserializeObject<Type>(json);
+                    return type;
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<List<Move>> GetMoveLearnedByPokemon(Pokemon pokemon)
@@ -149,7 +197,7 @@ namespace PokeApi.BackEnd.Service
                     {
                         int totalpokemoncount = 200;
                         var page = await pokeClient.GetNamedResourcePageAsync<Pokemon>(totalpokemoncount, currentPage);
-                        var tasks = page.Results.Select(result => GetPokemonAsync(result.Name)).ToList();
+                        var tasks = page.Results.Select(result => GetPokemon(result.Name)).ToList();
                         hasEmptyResults = tasks.Count == 0;
 
                         if (!hasEmptyResults)
@@ -167,13 +215,12 @@ namespace PokeApi.BackEnd.Service
                     if (retry < maxRetries - 1)
                     {
                         Console.Write(ex.Message);
-                        // Em caso de exceção, aguarde um curto período de tempo (opcional)
                         await Task.Delay(1000);
                     }
                 }
             }
 
-            throw new Exception("Falha após várias tentativas"); // Lança uma exceção após várias tentativas
+            throw new Exception("Falha após várias tentativas");
         }
 
         public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
@@ -246,11 +293,26 @@ namespace PokeApi.BackEnd.Service
 
         public async Task<PokemonSpecies> GetPokemonSpecies(string pokemonName)
         {
-            string lowerCasePokemonName = pokemonName.ToLower();
             try
             {
-                PokemonSpecies pokemonSpecies = await pokeClient.GetResourceAsync<PokemonSpecies>(lowerCasePokemonName);
-                return pokemonSpecies;
+                string url = $"https://pokeapi.co/api/v2/pokemon-species/{pokemonName}";
+                var response = await httpClient.GetAsync(url);
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                {
+                    await Task.Delay(1000);
+                    return await GetPokemonSpecies(pokemonName);
+                }
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    PokemonSpecies pokemonSpecies = JsonConvert.DeserializeObject<PokemonSpecies>(json);
+                    return pokemonSpecies;
+                }
+                return null;
             }
             catch (Exception)
             {
@@ -271,65 +333,73 @@ namespace PokeApi.BackEnd.Service
                 var poke = PokeList.pokemonList.FirstOrDefault(pokemon => pokemon.Id == id);
 
                 string url = poke.Sprites.FrontDefault;
-                if (url == null)
+                url ??= poke.Sprites.Versions.GenerationVIII.Icons.FrontDefault;
+                url ??= poke.Sprites.Versions.GenerationVII.Icons.FrontDefault;
+                url ??= $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName}.png";
+                if (url == "")
                 {
-                    url = poke.Sprites.Versions.GenerationVIII.Icons.FrontDefault;
+                    if (pokemonName.Contains("koraidon"))
+                    {
+                        url = "https://play.pokemonshowdown.com/sprites/gen5/koraidon.png";
+                    }
+                    else if (pokemonName.Contains("-totem") && pokemonName != "kommo-o-totem")
+                    {
+                        url = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName.Replace("-totem", "")}.png";
+                    }
+                    else if (pokemonName.Contains("kommo-o-totem"))
+                    {
+                        url = "https://play.pokemonshowdown.com/sprites/gen5/kommoo.png";
+                    }
+                    else if (pokemonName == "pikachu-world-cap")
+                    {
+                        url = "https://play.pokemonshowdown.com/sprites/gen5/pikachu-world.png";
+                    }
+                    else if (pokemonName.Contains("miraidon"))
+                    {
+                        url = "https://play.pokemonshowdown.com/sprites/gen5/miraidon.png";
+                    }
+                    else if (pokemonName.Contains("koraidon"))
+                    {
+                        url = "https://play.pokemonshowdown.com/sprites/gen5/koraidon.png";
+                    }
+                    else if (pokemonName.Contains("ogerpon-wellspring-mask"))
+                    {
+                        url = "https://play.pokemonshowdown.com/sprites/gen5/ogerpon-wellspring.png";
+                    }
+                    else if (pokemonName == "mimikyu-totem-disguised")
+                    {
+                        url = "https://play.pokemonshowdown.com/sprites/gen5/mimikyu.png";
+                    }
+
                 }
-                if (url == null)
+
+                var response = await httpClient.GetAsync(url);
+                if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    url = poke.Sprites.Versions.GenerationVII.Icons.FrontDefault;
+                    return null;
                 }
-                if (url == null)
+                else if (response.IsSuccessStatusCode)
                 {
-                    url = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName}.png";
-                }
-                if (pokemonName.Contains("koraidon"))
-                {
-                    url = "https://play.pokemonshowdown.com/sprites/gen5/koraidon.png";
-                }
-                if (pokemonName.Contains("-totem"))
-                {
-                    url = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName.Replace("-totem", "")}.png";
-                }
-                if (pokemonName.Contains("kommo-o-totem"))
-                {
-                    url = "https://play.pokemonshowdown.com/sprites/gen5/kommoo.png";
-                }
-                if (pokemonName == "pikachu-world-cap")
-                {
-                    url = "https://play.pokemonshowdown.com/sprites/gen5/pikachu-world.png";
-                }
-                if (pokemonName.Contains("miraidon"))
-                {
-                    url = "https://play.pokemonshowdown.com/sprites/gen5/miraidon.png";
-                }
-                if (pokemonName.Contains("koraidon"))
-                {
-                    url = "https://play.pokemonshowdown.com/sprites/gen5/koraidon.png";
-                }
-                try
-                {
-                    HttpClient httpClient = new HttpClient();
                     var loader = new PixbufLoader();
+                    response.EnsureSuccessStatusCode();
 
                     var result = await httpClient.GetByteArrayAsync(url);
-                    loader.Write(result);
 
-                    loader.Close();
-                    var pokemonImage = loader.Pixbuf;
-                    PokeList._pokemonImageCache[id] = pokemonImage;
-
-                    return pokemonImage;
+                    if (result != null)
+                    {
+                        loader.Write(result);
+                        loader.Close();
+                        var pokemonImage = loader.Pixbuf;
+                        PokeList._pokemonImageCache[id] = pokemonImage;
+                        return pokemonImage;
+                    }
                 }
-                catch (Exception)
-                {
-                    throw;
-                }
+                return null;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao carregar a imagem." + ex + "Pokemon:" + pokemonName);
-                throw;
+                return null;
             }
         }
 
@@ -449,7 +519,7 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public async Task GetPokemonStaticSprite(string pokemonName, bool isShiny)
+        public async Task GetPokemonStaticSprite(string pokemonName, bool shiny)
         {
             #region if's name validation
 
@@ -498,7 +568,7 @@ namespace PokeApi.BackEnd.Service
 
             #endregion if's name validation
 
-            if (isShiny)
+            if (shiny)
             {
                 imageUrl = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName.ToLower()}.png";
             }
@@ -520,7 +590,7 @@ namespace PokeApi.BackEnd.Service
                     {
                         Directory.CreateDirectory(pastaDestino);
                     }
-                    if (isShiny)
+                    if (shiny)
                     {
                         nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
                     }
@@ -537,61 +607,6 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public double GetProgress()
-        {
-            double progress = 0.0;
-            int totalpokemoncount = PokeList.pokemonList.Count;
-
-            if (totalpokemoncount == 0)
-            {
-                return progress;
-            }
-            if (totalpokemoncount > 0)
-            {
-                if (totalpokemoncount == 200)
-                {
-                    progress = 0.2;
-                    return progress;
-                }
-                else if (totalpokemoncount == 400)
-                {
-                    progress = 0.4;
-                    return progress;
-                }
-                else if (totalpokemoncount == 600)
-                {
-                    progress = 0.6;
-                    return progress;
-                }
-                else if (totalpokemoncount == 800)
-                {
-                    progress = 0.8;
-                    return progress;
-                }
-                else if (totalpokemoncount == 1000)
-                {
-                    progress = 0.85;
-                    return progress;
-                }
-                else if (totalpokemoncount == 1200)
-                {
-                    progress = 0.9;
-                    return progress;
-                }
-                else if (totalpokemoncount == 1292)
-                {
-                    progress = 1.0;
-                    return progress;
-                }
-            }
-            else
-            {
-                progress = 1.0;
-                return progress;
-            }
-            return progress;
-        }
-
         public async Task<EvolutionChain> GetEvolutionChain(string nextEvolution)
         {
             EvolutionChain evolutionChain = new();
@@ -604,8 +619,23 @@ namespace PokeApi.BackEnd.Service
                     {
                         if (int.TryParse(urlParts[urlParts.Length - 2], out int evolutionChainId))
                         {
-                            evolutionChain = await pokeClient.GetResourceAsync<EvolutionChain>(evolutionChainId);
-                            return evolutionChain;
+                            string url = $"https://pokeapi.co/api/v2/evolution-chain/{evolutionChainId}";
+                            var response = await httpClient.GetAsync(url);
+                            if (response.StatusCode == HttpStatusCode.NotFound)
+                            {
+                                return null;
+                            }
+                            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                            {
+                                await Task.Delay(1000);
+                                return await GetEvolutionChain(nextEvolution);
+                            }
+                            if (response.IsSuccessStatusCode)
+                            {
+                                string json = await response.Content.ReadAsStringAsync();
+                                evolutionChain = JsonConvert.DeserializeObject<EvolutionChain>(json);
+                                return evolutionChain;
+                            }
                         }
                     }
                 }
@@ -622,8 +652,26 @@ namespace PokeApi.BackEnd.Service
         {
             try
             {
-                PokemonForm pokemonForm = await pokeClient.GetResourceAsync<PokemonForm>(name);
-                return pokemonForm;
+                string url = $"https://pokeapi.co/api/v2/pokemon-form/{name}";
+                var response = await httpClient.GetAsync(url);
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                {
+                    await Task.Delay(1000);
+                    return await GetPokemonForm(name);
+                }
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    PokemonForm pokemonForm = JsonConvert.DeserializeObject<PokemonForm>(json);
+                    return pokemonForm;
+                }
+                return null;
+                //PokemonForm pokemonForm = await pokeClient.GetResourceAsync<PokemonForm>(name);
+                //return pokemonForm;
             }
             catch (Exception)
             {
@@ -635,8 +683,26 @@ namespace PokeApi.BackEnd.Service
         {
             try
             {
-                Ability ability = await pokeClient.GetResourceAsync<Ability>(abilityName);
-                return ability;
+                string url = $"https://pokeapi.co/api/v2/ability/{abilityName}";
+                var response = await httpClient.GetAsync(url);
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                {
+                    await Task.Delay(1000);
+                    return await GetPokemonAbility(abilityName);
+                }
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    Ability ability = JsonConvert.DeserializeObject<Ability>(json);
+                    return ability;
+                }
+                return null;
+                //Ability ability = await pokeClient.GetResourceAsync<Ability>(abilityName);
+                //return ability;
             }
             catch (Exception)
             {
@@ -707,11 +773,6 @@ namespace PokeApi.BackEnd.Service
             {
                 throw;
             }
-        }
-
-        public string GetTypeDamageRelation(string type)
-        {
-            return PokeList.TypeDamageRelations[type];
         }
     }
 }
