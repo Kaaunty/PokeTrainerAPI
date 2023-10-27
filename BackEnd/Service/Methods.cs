@@ -1,6 +1,7 @@
-﻿using Gdk;
-using Gtk;
+﻿using static PokeApi.BackEnd.Service.ApiRequest;
 using PokeApiNet;
+using Gdk;
+using Gtk;
 
 namespace PokeApi.BackEnd.Service
 {
@@ -10,8 +11,9 @@ namespace PokeApi.BackEnd.Service
 
         private readonly ApiRequest _apiRequest = new();
 
-        private Image Pokeball = new Image("Images/pokeball.png");
-        private List<Pokemon> pokemonlist = new List<Pokemon>();
+        private Image _Pokeball = new("Images/pokeball.png");
+        private List<Pokemon> _pokemonlist = new();
+        private List<Pokemon> _pokemonListSearch = new();
 
         public void Initialize(int currentPage, string type, int choice)
         {
@@ -22,19 +24,23 @@ namespace PokeApi.BackEnd.Service
         {
             if (choice == 0)
             {
-                pokemonlist = _apiRequest.GetPokemonListByTypeAll(currentPage, type);
+                _pokemonlist = _apiRequest.GetPokemonListByTypeAll(currentPage, type);
+                _pokemonListSearch = PokeList.pokemonListAll;
             }
             if (choice == 1)
             {
-                pokemonlist = _apiRequest.GetPokemonListByTypePure(currentPage, type);
+                _pokemonlist = _apiRequest.GetPokemonListByTypePure(currentPage, type);
+                _pokemonListSearch = PokeList.pokemonListPureType;
             }
             else if (choice == 2)
             {
-                pokemonlist = _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
+                _pokemonlist = _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
+                _pokemonListSearch = PokeList.pokemonListHalfType;
             }
             else if (choice == 3)
             {
-                pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
+                _pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
+                _pokemonListSearch = PokeList.pokemonListHalfSecundaryType;
             }
         }
 
@@ -50,15 +56,15 @@ namespace PokeApi.BackEnd.Service
                     Button btn = (Button)button;
                     if (VerifyButtonName(btn.Name))
                     {
-                        if (buttonIndex < pokemonlist.Count)
+                        if (buttonIndex < _pokemonlist.Count)
                         {
-                            btn.Data["id"] = pokemonlist[buttonIndex].Id;
-                            btn.Data["name"] = pokemonlist[buttonIndex].Name;
+                            btn.Data["id"] = _pokemonlist[buttonIndex].Id;
+                            btn.Data["name"] = _pokemonlist[buttonIndex].Name;
                             btn.Sensitive = true;
 
                             if (VerifyButtonName(btn.Name))
                             {
-                                var pokemon = pokemonlist[buttonIndex];
+                                var pokemon = _pokemonlist[buttonIndex];
                                 UpdateButtonImages(btn, pokemon.Id);
                             }
 
@@ -83,30 +89,27 @@ namespace PokeApi.BackEnd.Service
             string pokemonName = PokeName.ToLower();
             if (pokemonName != string.Empty && pokemonName != "Buscar Pokémon")
             {
-                pokemonlist = pokemonlist.Where(pokemon => pokemon.Name.StartsWith(pokemonName)).ToList();
+                _pokemonListSearch = _pokemonListSearch.Where(pokemon => pokemon.Name.StartsWith(pokemonName)).ToList();
             }
 
             int buttonIndex = 0;
 
-            foreach (var widget in fix.AllChildren)
+            foreach (var button in fix.AllChildren)
             {
-                if (widget is VBox)
+                if (button is Button)
                 {
-                    var vboxwidget = (VBox)widget;
-                    foreach (var button in vboxwidget.AllChildren)
+                    Button btn = (Button)button;
+                    if (VerifyButtonName(btn.Name))
                     {
-                        Button btn = (Button)button;
-
-                        if (buttonIndex < pokemonlist.Count)
+                        if (buttonIndex < _pokemonListSearch.Count)
                         {
-                            btn.Data["id"] = pokemonlist[buttonIndex].Id;
-                            btn.Data["name"] = pokemonlist[buttonIndex].Name;
+                            btn.Data["id"] = _pokemonListSearch[buttonIndex].Id;
+                            btn.Data["name"] = _pokemonListSearch[buttonIndex].Name;
                             btn.Sensitive = true;
-                            btn.Image = Pokeball;
 
                             if (VerifyButtonName(btn.Name))
                             {
-                                var pokemon = pokemonlist[buttonIndex];
+                                var pokemon = _pokemonListSearch[buttonIndex];
                                 UpdateButtonImages(btn, pokemon.Id);
                             }
 
@@ -255,9 +258,9 @@ namespace PokeApi.BackEnd.Service
 
         public void DisableButtons(Button btn)
         {
-            if (pokemonlist != null)
+            if (_pokemonlist != null)
             {
-                if (pokemonlist.Count < 25)
+                if (_pokemonlist.Count < 25)
                 {
                     btn.Sensitive = false;
                 }

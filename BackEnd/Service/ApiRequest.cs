@@ -20,6 +20,10 @@ namespace PokeApi.BackEnd.Service
         public static class PokeList
         {
             public static List<Pokemon> pokemonList = new List<Pokemon>();
+            public static List<Pokemon> pokemonListAll = new List<Pokemon>();
+            public static List<Pokemon> pokemonListPureType = new List<Pokemon>();
+            public static List<Pokemon> pokemonListHalfType = new List<Pokemon>();
+            public static List<Pokemon> pokemonListHalfSecundaryType = new List<Pokemon>();
             public static List<Move> pokemonMoves = new List<Move>();
             public static Dictionary<int, Pixbuf> _pokemonImageCache = new Dictionary<int, Pixbuf>();
             public static Dictionary<string, string> TypeDamageRelations = new();
@@ -223,15 +227,15 @@ namespace PokeApi.BackEnd.Service
             throw new Exception("Falha após várias tentativas");
         }
 
-        public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
+        public List<Pokemon> GetPokemonListByTypeAll(int currentpage, string type)
         {
             string lowercasetype = type.ToLower();
             try
             {
                 var pokemonList = PokeList.pokemonList;
 
-                pokemonList = pokemonList.Where(pokemon => pokemon.Types.TrueForAll(type => type.Slot == 1) && pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
-                pokemonList = pokemonList.Skip(currentpage).Take(25).ToList();
+                PokeList.pokemonListAll = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
+                pokemonList = PokeList.pokemonListAll.Skip(currentpage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
@@ -240,15 +244,15 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public List<Pokemon> GetPokemonListByTypeAll(int currentpage, string type)
+        public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type)
         {
             string lowercasetype = type.ToLower();
             try
             {
                 var pokemonList = PokeList.pokemonList;
 
-                pokemonList = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
-                pokemonList = pokemonList.Skip(currentpage).Take(25).ToList();
+                PokeList.pokemonListPureType = pokemonList.Where(pokemon => pokemon.Types.TrueForAll(type => type.Slot == 1) && pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
+                pokemonList = PokeList.pokemonListPureType.Skip(currentpage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
@@ -264,8 +268,8 @@ namespace PokeApi.BackEnd.Service
             {
                 var pokemonList = PokeList.pokemonList;
 
-                pokemonList = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype) && pokemon.Types.Any(type => type.Slot == 1)).ToList();
-                pokemonList = pokemonList.Skip(currentpage).Take(25).ToList();
+                PokeList.pokemonListHalfType = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype) && pokemon.Types.Any(type => type.Slot == 2)).ToList();
+                pokemonList = PokeList.pokemonListHalfType.Skip(currentpage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
@@ -281,8 +285,8 @@ namespace PokeApi.BackEnd.Service
             {
                 var pokemonList = PokeList.pokemonList;
 
-                pokemonList = pokemonList.Where(pokemon => pokemon.Types.Count >= 2 && pokemon.Types[1].Type.Name == lowercasetype).ToList();
-                pokemonList = pokemonList.Skip(currentPage).Take(25).ToList();
+                PokeList.pokemonListHalfSecundaryType = pokemonList.Where(pokemon => pokemon.Types.Count >= 2 && pokemon.Types[1].Type.Name == lowercasetype).ToList();
+                pokemonList = PokeList.pokemonListHalfSecundaryType.Skip(currentPage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
