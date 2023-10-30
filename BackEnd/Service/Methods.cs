@@ -1,7 +1,7 @@
-﻿using static PokeApi.BackEnd.Service.ApiRequest;
-using PokeApiNet;
-using Gdk;
+﻿using Gdk;
 using Gtk;
+using PokeApiNet;
+using static PokeApi.BackEnd.Service.ApiRequest;
 
 namespace PokeApi.BackEnd.Service
 {
@@ -22,25 +22,33 @@ namespace PokeApi.BackEnd.Service
 
         public void LoadPokemonList(int currentPage, string type, int choice)
         {
-            if (choice == 0)
+            if (type == "all")
             {
-                _pokemonlist = _apiRequest.GetPokemonListByTypeAll(currentPage, type);
-                _pokemonListSearch = PokeList.pokemonListAll;
+                _pokemonlist = PokeList.pokemonList;
+                _pokemonListSearch = PokeList.pokemonList;
             }
-            if (choice == 1)
+            else
             {
-                _pokemonlist = _apiRequest.GetPokemonListByTypePure(currentPage, type);
-                _pokemonListSearch = PokeList.pokemonListPureType;
-            }
-            else if (choice == 2)
-            {
-                _pokemonlist = _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
-                _pokemonListSearch = PokeList.pokemonListHalfType;
-            }
-            else if (choice == 3)
-            {
-                _pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
-                _pokemonListSearch = PokeList.pokemonListHalfSecundaryType;
+                if (choice == 0)
+                {
+                    _pokemonlist = _apiRequest.GetPokemonListByTypeAll(currentPage, type);
+                    _pokemonListSearch = PokeList.pokemonListAll;
+                }
+                if (choice == 1)
+                {
+                    _pokemonlist = _apiRequest.GetPokemonListByTypePure(currentPage, type);
+                    _pokemonListSearch = PokeList.pokemonListPureType;
+                }
+                else if (choice == 2)
+                {
+                    _pokemonlist = _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
+                    _pokemonListSearch = PokeList.pokemonListHalfType;
+                }
+                else if (choice == 3)
+                {
+                    _pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
+                    _pokemonListSearch = PokeList.pokemonListHalfSecundaryType;
+                }
             }
         }
 
