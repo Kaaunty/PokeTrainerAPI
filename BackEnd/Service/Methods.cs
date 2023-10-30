@@ -11,7 +11,6 @@ namespace PokeApi.BackEnd.Service
 
         private readonly ApiRequest _apiRequest = new();
 
-        private Image _Pokeball = new("Images/pokeball.png");
         private List<Pokemon> _pokemonlist = new();
         private List<Pokemon> _pokemonListSearch = new();
 
