@@ -1,6 +1,6 @@
-﻿using Gdk;
+﻿using Type = PokeApiNet.Type;
 using PokeApiNet;
-using Type = PokeApiNet.Type;
+using Gdk;
 
 namespace PokeApi.BackEnd.Service
 {
