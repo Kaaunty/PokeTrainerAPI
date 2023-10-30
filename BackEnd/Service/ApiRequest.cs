@@ -14,8 +14,9 @@ namespace PokeApi.BackEnd.Service
     {
 #nullable disable
 
-        private readonly PokeApiClient pokeClient = new PokeApiClient();
-        private HttpClient httpClient = new HttpClient();
+        private readonly PokeApiClient _pokeClient = new PokeApiClient();
+        private HttpClient _httpClient = new HttpClient();
+        private HttpClientHandler _handler = new HttpClientHandler();
 
         public static class PokeList
         {
@@ -39,7 +40,9 @@ namespace PokeApi.BackEnd.Service
             string url = $"https://pokeapi.co/api/v2/pokemon/{name}";
             try
             {
-                var response = await httpClient.GetAsync(url);
+                _httpClient = new HttpClient(_handler);
+
+                var response = await _httpClient.GetAsync(url);
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     return null;
@@ -150,7 +153,7 @@ namespace PokeApi.BackEnd.Service
             string url = $"https://pokeapi.co/api/v2/type/{name}";
             try
             {
-                var response = await httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(url);
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     return null;
@@ -178,7 +181,7 @@ namespace PokeApi.BackEnd.Service
         {
             try
             {
-                List<Move> allMoves = await pokeClient.GetResourceAsync(pokemon.Moves.Select(move => move.Move));
+                List<Move> allMoves = await _pokeClient.GetResourceAsync(pokemon.Moves.Select(move => move.Move));
                 return allMoves;
             }
             catch (Exception)
@@ -189,6 +192,8 @@ namespace PokeApi.BackEnd.Service
 
         public async Task<List<Pokemon>> GetPokemonsListAll()
         {
+            _handler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => { return true; };
+            _httpClient = new HttpClient(_handler);
             bool hasEmptyResults;
             int currentPage = 0;
             int maxRetries = 3;
@@ -200,7 +205,7 @@ namespace PokeApi.BackEnd.Service
                     do
                     {
                         int totalpokemoncount = 200;
-                        var page = await pokeClient.GetNamedResourcePageAsync<Pokemon>(totalpokemoncount, currentPage);
+                        var page = await _pokeClient.GetNamedResourcePageAsync<Pokemon>(totalpokemoncount, currentPage);
                         var tasks = page.Results.Select(result => GetPokemon(result.Name)).ToList();
                         hasEmptyResults = tasks.Count == 0;
 
@@ -300,7 +305,7 @@ namespace PokeApi.BackEnd.Service
             try
             {
                 string url = $"https://pokeapi.co/api/v2/pokemon-species/{pokemonName}";
-                var response = await httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(url);
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     return null;
@@ -374,10 +379,9 @@ namespace PokeApi.BackEnd.Service
                     {
                         url = "https://play.pokemonshowdown.com/sprites/gen5/mimikyu.png";
                     }
-
                 }
 
-                var response = await httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(url);
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     return null;
@@ -387,7 +391,7 @@ namespace PokeApi.BackEnd.Service
                     var loader = new PixbufLoader();
                     response.EnsureSuccessStatusCode();
 
-                    var result = await httpClient.GetByteArrayAsync(url);
+                    var result = await _httpClient.GetByteArrayAsync(url);
 
                     if (result != null)
                     {
@@ -569,6 +573,10 @@ namespace PokeApi.BackEnd.Service
             {
                 pokemonName = "tauros-paldeaaqua";
             }
+            if (pokemonName == "roaring-moon")
+            {
+                pokemonName = "roaringmoon";
+            }
 
             #endregion if's name validation
 
@@ -624,7 +632,7 @@ namespace PokeApi.BackEnd.Service
                         if (int.TryParse(urlParts[urlParts.Length - 2], out int evolutionChainId))
                         {
                             string url = $"https://pokeapi.co/api/v2/evolution-chain/{evolutionChainId}";
-                            var response = await httpClient.GetAsync(url);
+                            var response = await _httpClient.GetAsync(url);
                             if (response.StatusCode == HttpStatusCode.NotFound)
                             {
                                 return null;
@@ -657,7 +665,7 @@ namespace PokeApi.BackEnd.Service
             try
             {
                 string url = $"https://pokeapi.co/api/v2/pokemon-form/{name}";
-                var response = await httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(url);
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     return null;
@@ -688,7 +696,7 @@ namespace PokeApi.BackEnd.Service
             try
             {
                 string url = $"https://pokeapi.co/api/v2/ability/{abilityName}";
-                var response = await httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(url);
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     return null;
