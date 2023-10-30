@@ -3,7 +3,7 @@
 
 ## Demonstração
 
-<img align="center" alt="poke-trainer"  src="https://i.imgur.com/tMOCD7B.png">
+https://github.com/Kaaunty/PokeTrainerAPI/assets/83998740/fb9968e5-8528-41ef-9e24-731782dc73e9
 
 ## Funcionalidades
 
