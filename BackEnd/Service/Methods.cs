@@ -31,7 +31,7 @@ namespace PokeApi.BackEnd.Service
                 if (choice == 0)
                 {
                     _pokemonlist = _apiRequest.GetPokemonListByTypeAll(currentPage, type);
-                    _pokemonListSearch = PokeList.pokemonListAll;
+                    _pokemonListSearch = PokeList.pokemonListAllType;
                 }
                 if (choice == 1)
                 {

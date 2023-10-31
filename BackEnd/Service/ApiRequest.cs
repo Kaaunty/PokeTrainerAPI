@@ -20,20 +20,19 @@ namespace PokeApi.BackEnd.Service
         public static class PokeList
         {
             public static List<Pokemon> pokemonList = new List<Pokemon>();
-            public static List<Pokemon> pokemonListAll = new List<Pokemon>();
+            public static List<Pokemon> pokemonListAllType = new List<Pokemon>();
             public static List<Pokemon> pokemonListPureType = new List<Pokemon>();
             public static List<Pokemon> pokemonListHalfType = new List<Pokemon>();
             public static List<Pokemon> pokemonListHalfSecundaryType = new List<Pokemon>();
-            public static List<Move> pokemonMoves = new List<Move>();
             public static Dictionary<int, Pixbuf> _pokemonImageCache = new Dictionary<int, Pixbuf>();
             public static Dictionary<string, string> TypeDamageRelations = new();
-            public static List<Move> pokemonMoveList = new List<Move>();
         }
 
         public async Task<Pokemon> GetPokemon(string name)
         {
             _pokeClient.ClearCache();
             _pokeClient.ClearResourceListCache();
+
             if (name == "mimikyu")
             {
                 name = "mimikyu-disguised";
@@ -64,6 +63,7 @@ namespace PokeApi.BackEnd.Service
             catch (Exception ex)
             {
                 Console.WriteLine("Erro ao carregar o pokemon." + ex);
+                return await GetPokemon(name);
                 throw;
             }
         }
@@ -194,7 +194,7 @@ namespace PokeApi.BackEnd.Service
         public async Task<List<Pokemon>> GetPokemonsListAll()
         {
             _handler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => { return true; };
-            _httpClient = new HttpClient(_handler);
+
             bool hasEmptyResults;
             int currentPage = 0;
             int maxRetries = 3;
@@ -254,8 +254,8 @@ namespace PokeApi.BackEnd.Service
             {
                 var pokemonList = PokeList.pokemonList;
 
-                PokeList.pokemonListAll = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
-                pokemonList = PokeList.pokemonListAll.Skip(currentpage).Take(25).ToList();
+                PokeList.pokemonListAllType = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
+                pokemonList = PokeList.pokemonListAllType.Skip(currentpage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
@@ -381,10 +381,6 @@ namespace PokeApi.BackEnd.Service
                     else if (pokemonName.Contains("miraidon"))
                     {
                         url = "https://play.pokemonshowdown.com/sprites/gen5/miraidon.png";
-                    }
-                    else if (pokemonName.Contains("koraidon"))
-                    {
-                        url = "https://play.pokemonshowdown.com/sprites/gen5/koraidon.png";
                     }
                     else if (pokemonName.Contains("ogerpon-wellspring-mask"))
                     {
@@ -518,27 +514,36 @@ namespace PokeApi.BackEnd.Service
             {
                 using (HttpClient httpClient = new HttpClient())
                 {
-                    byte[] gifBytes = await httpClient.GetByteArrayAsync(imageUrl);
+                    var response = await httpClient.GetAsync(imageUrl);
 
-                    if (!Directory.Exists(pastaDestino))
+                    if (response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        Directory.CreateDirectory(pastaDestino);
+                        await GetPokemonStaticSprite(pokemonName, shiny);
                     }
-                    if (shiny)
+                    else if (response.IsSuccessStatusCode)
                     {
-                        nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
-                    }
-                    else
-                    {
-                        nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimated.gif");
-                    }
+                        byte[] gifBytes = await httpClient.GetByteArrayAsync(imageUrl);
 
-                    File.WriteAllBytes(nomeArquivo, gifBytes);
+                        if (!Directory.Exists(pastaDestino))
+                        {
+                            Directory.CreateDirectory(pastaDestino);
+                        }
+                        if (shiny)
+                        {
+                            nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
+                        }
+                        else
+                        {
+                            nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimated.gif");
+                        }
+
+                        File.WriteAllBytes(nomeArquivo, gifBytes);
+                    }
                 }
             }
             catch (Exception)
             {
-                await GetPokemonStaticSprite(pokemonName, shiny);
+                Console.WriteLine("Erro ao carregar a imagem.");
             }
         }
 
@@ -597,11 +602,11 @@ namespace PokeApi.BackEnd.Service
 
             if (shiny)
             {
-                imageUrl = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName.ToLower()}.png";
+                imageUrl = $"https://play.pokemonshowdown.com/sprites/gen5-shiny/{pokemonName.ToLower()}.png";
             }
             else
             {
-                imageUrl = $"https://play.pokemonshowdown.com/sprites/gen5-shiny/{pokemonName.ToLower()}.png";
+                imageUrl = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName.ToLower()}.png";
             }
 
             string pastaDestino = "Images";
@@ -697,8 +702,6 @@ namespace PokeApi.BackEnd.Service
                     return pokemonForm;
                 }
                 return null;
-                //PokemonForm pokemonForm = await pokeClient.GetResourceAsync<PokemonForm>(name);
-                //return pokemonForm;
             }
             catch (Exception)
             {
@@ -728,8 +731,6 @@ namespace PokeApi.BackEnd.Service
                     return ability;
                 }
                 return null;
-                //Ability ability = await pokeClient.GetResourceAsync<Ability>(abilityName);
-                //return ability;
             }
             catch (Exception)
             {
