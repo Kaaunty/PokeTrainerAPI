@@ -23,7 +23,7 @@ namespace PokeApi.BackEnd.Service
         {
             if (type == "all")
             {
-                _pokemonlist = PokeList.pokemonList;
+                _pokemonlist = _apiRequest.GetPokemonListAll(currentPage);
                 _pokemonListSearch = PokeList.pokemonList;
             }
             else

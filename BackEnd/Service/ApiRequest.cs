@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using PokeApiNet;
 using System.Net;
 using System.Web;
-using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 using Type = PokeApiNet.Type;
@@ -33,6 +32,8 @@ namespace PokeApi.BackEnd.Service
 
         public async Task<Pokemon> GetPokemon(string name)
         {
+            _pokeClient.ClearCache();
+            _pokeClient.ClearResourceListCache();
             if (name == "mimikyu")
             {
                 name = "mimikyu-disguised";
@@ -230,6 +231,20 @@ namespace PokeApi.BackEnd.Service
             }
 
             throw new Exception("Falha após várias tentativas");
+        }
+
+        public List<Pokemon> GetPokemonListAll(int currentpage)
+        {
+            try
+            {
+                var pokemonList = PokeList.pokemonList;
+                pokemonList = pokemonList.Skip(currentpage).Take(25).ToList();
+                return pokemonList;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public List<Pokemon> GetPokemonListByTypeAll(int currentpage, string type)
