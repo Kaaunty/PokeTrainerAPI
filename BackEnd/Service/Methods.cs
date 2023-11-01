@@ -1,8 +1,8 @@
-﻿using Gdk;
-using Gtk;
+﻿using static PokeApi.BackEnd.Service.PokemonApiRequest;
 using PokeApi.BackEnd.Entities;
 using PokeApiNet;
-using static PokeApi.BackEnd.Service.PokemonApiRequest;
+using Gdk;
+using Gtk;
 
 namespace PokeApi.BackEnd.Service
 {
