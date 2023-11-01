@@ -1,6 +1,4 @@
-﻿using static PokeApi.BackEnd.Service.ApiRequest;
-using PokeApiNet;
-using Gdk;
+﻿using Gdk;
 using Gtk;
 using PokeApi.BackEnd.Entities;
 using PokeApiNet;
@@ -11,8 +9,6 @@ namespace PokeApi.BackEnd.Service
     public class Methods
     {
 #nullable disable
-
-        private readonly PokemonApiRequest _apiRequest = new();
 
         private List<Pokemon> _pokemonlist = new();
         private List<Pokemon> _pokemonListSearch = new();
