@@ -13,8 +13,6 @@ namespace PokeApi.BackEnd.Service
         private List<Pokemon> _pokemonlist = new();
         private List<Pokemon> _pokemonListSearch = new();
 
-        private int buttonIndex = 0;
-
         public void Initialize(int currentPage, string type, int choice)
         {
             LoadPokemonList(currentPage, type, choice, new PokemonApiRequest());
@@ -56,6 +54,8 @@ namespace PokeApi.BackEnd.Service
         {
             Initialize(currentPage, type, choice);
 
+            int buttonIndex = 0;
+
             foreach (var button in fix.AllChildren)
             {
                 if (button is Button)
@@ -63,7 +63,7 @@ namespace PokeApi.BackEnd.Service
                     Button btn = (Button)button;
                     if (VerifyButtonName(btn.Name))
                     {
-                        if (_pokemonlist.Count > 0)
+                        if (buttonIndex < _pokemonlist.Count)
                         {
                             btn.Data["id"] = _pokemonlist[buttonIndex].Id;
                             btn.Data["name"] = _pokemonlist[buttonIndex].Name;
@@ -93,6 +93,8 @@ namespace PokeApi.BackEnd.Service
         {
             Initialize(currentPage, type, choice);
 
+            int buttonIndex = 0;
+
             string pokemonName = PokeName.ToLower();
             if (pokemonName != string.Empty && pokemonName != "Buscar Pokémon")
             {
@@ -106,7 +108,7 @@ namespace PokeApi.BackEnd.Service
                     Button btn = (Button)button;
                     if (VerifyButtonName(btn.Name))
                     {
-                        if (_pokemonListSearch.Count > 0)
+                        if (buttonIndex < _pokemonListSearch.Count)
                         {
                             btn.Data["id"] = _pokemonListSearch[buttonIndex].Id;
                             btn.Data["name"] = _pokemonListSearch[buttonIndex].Name;
