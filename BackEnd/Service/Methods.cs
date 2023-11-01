@@ -1,4 +1,6 @@
-﻿using Gdk;
+﻿using static PokeApi.BackEnd.Service.ApiRequest;
+using PokeApiNet;
+using Gdk;
 using Gtk;
 using PokeApi.BackEnd.Entities;
 using PokeApiNet;
@@ -14,6 +16,8 @@ namespace PokeApi.BackEnd.Service
 
         private List<Pokemon> _pokemonlist = new();
         private List<Pokemon> _pokemonListSearch = new();
+
+        private int buttonIndex = 0;
 
         public void Initialize(int currentPage, string type, int choice)
         {
@@ -55,7 +59,6 @@ namespace PokeApi.BackEnd.Service
         public void UpdateButtons(Fixed fix, int currentPage, string type, int choice)
         {
             Initialize(currentPage, type, choice);
-            int buttonIndex = 0;
 
             foreach (var button in fix.AllChildren)
             {
@@ -64,7 +67,7 @@ namespace PokeApi.BackEnd.Service
                     Button btn = (Button)button;
                     if (VerifyButtonName(btn.Name))
                     {
-                        if (buttonIndex < _pokemonlist.Count)
+                        if (_pokemonlist.Count > 0)
                         {
                             btn.Data["id"] = _pokemonlist[buttonIndex].Id;
                             btn.Data["name"] = _pokemonlist[buttonIndex].Name;
@@ -100,8 +103,6 @@ namespace PokeApi.BackEnd.Service
                 _pokemonListSearch = _pokemonListSearch.Where(pokemon => pokemon.Name.StartsWith(pokemonName)).ToList();
             }
 
-            int buttonIndex = 0;
-
             foreach (var button in fix.AllChildren)
             {
                 if (button is Button)
@@ -109,7 +110,7 @@ namespace PokeApi.BackEnd.Service
                     Button btn = (Button)button;
                     if (VerifyButtonName(btn.Name))
                     {
-                        if (buttonIndex < _pokemonListSearch.Count)
+                        if (_pokemonListSearch.Count > 0)
                         {
                             btn.Data["id"] = _pokemonListSearch[buttonIndex].Id;
                             btn.Data["name"] = _pokemonListSearch[buttonIndex].Name;
