@@ -4,6 +4,8 @@ using System.Web;
 
 namespace PokeApi.BackEnd.Service
 {
+#nullable disable
+
     public class GoogleTranslationApi : ITranslationAPI
     {
         public async Task<String> Translate(string input)
