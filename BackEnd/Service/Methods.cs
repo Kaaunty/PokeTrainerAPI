@@ -12,6 +12,7 @@ namespace PokeApi.BackEnd.Service
 
         private List<Pokemon> _pokemonlist = new();
         private List<Pokemon> _pokemonListSearch = new();
+        private int _maxPokemonPerPage = 25;
 
         public void Initialize(int currentPage, string type, int choice)
         {
@@ -267,7 +268,7 @@ namespace PokeApi.BackEnd.Service
         {
             if (_pokemonlist != null)
             {
-                if (_pokemonlist.Count < 25)
+                if (_pokemonlist.Count < _maxPokemonPerPage)
                 {
                     btn.Sensitive = false;
                 }
