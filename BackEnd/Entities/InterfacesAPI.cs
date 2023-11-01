@@ -2,17 +2,23 @@
 using PokeApiNet;
 using Gdk;
 
-namespace PokeApi.BackEnd.Service
+namespace PokeApi.BackEnd.Entities
 {
-    public interface IApiRequests
+    public interface IPokemonAPI
     {
+        public Task<double> GetPokemonTotalCount();
+
         public Task<Pokemon> GetPokemon(string name);
+
+        public Pokemon GetPokemonByName(string pokemonName);
 
         public Task<Type> GetTypeAsync(string name);
 
         public Task<List<Move>> GetMoveLearnedByPokemon(Pokemon pokemon);
 
-        public Task<List<Pokemon>> GetPokemonsListAll();
+        public Task<List<Pokemon>> LoadPokemonsListAll();
+
+        public List<Pokemon> GetPokemonListAll(int currentpage);
 
         public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type);
 
@@ -24,20 +30,26 @@ namespace PokeApi.BackEnd.Service
 
         public Task<PokemonSpecies> GetPokemonSpecies(string pokemonName);
 
-        public Task<Pixbuf> LoadPokemonSprite(int id);
-
-        public Task GetPokemonAnimatedSprite(string pokemonName, bool shiny);
-
-        public Task GetPokemonStaticSprite(string pokemonName, bool shiny);
-
         public Task<EvolutionChain> GetEvolutionChain(string nextEvolution);
 
         public Task<PokemonForm> GetPokemonForm(string name);
 
         public Task<Ability> GetPokemonAbility(string abilityName);
+    }
 
-        public Task<String> Translate(string input);
+    public interface ITranslationAPI
+    {
+        public Task<string> Translate(string input);
 
         public string TranslateType(string input);
+    }
+
+    public interface IPokemonSpriteLoaderAPI
+    {
+        public Task<Pixbuf> LoadPokemonSprite(int id);
+
+        public Task GetPokemonAnimatedSprite(string pokemonName, bool shiny);
+
+        public Task GetPokemonStaticSprite(string pokemonName, bool shiny);
     }
 }

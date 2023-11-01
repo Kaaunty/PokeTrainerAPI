@@ -1,7 +1,8 @@
 ﻿using Gdk;
 using Gtk;
+using PokeApi.BackEnd.Entities;
 using PokeApiNet;
-using static PokeApi.BackEnd.Service.ApiRequest;
+using static PokeApi.BackEnd.Service.PokemonApiRequest;
 
 namespace PokeApi.BackEnd.Service
 {
@@ -9,43 +10,43 @@ namespace PokeApi.BackEnd.Service
     {
 #nullable disable
 
-        private readonly ApiRequest _apiRequest = new();
+        private readonly PokemonApiRequest _apiRequest = new();
 
         private List<Pokemon> _pokemonlist = new();
         private List<Pokemon> _pokemonListSearch = new();
 
         public void Initialize(int currentPage, string type, int choice)
         {
-            LoadPokemonList(currentPage, type, choice);
+            LoadPokemonList(currentPage, type, choice, new PokemonApiRequest());
         }
 
-        public void LoadPokemonList(int currentPage, string type, int choice)
+        public void LoadPokemonList(int currentPage, string type, int choice, IPokemonAPI pokemonAPI)
         {
             if (type == "all")
             {
-                _pokemonlist = _apiRequest.GetPokemonListAll(currentPage);
+                _pokemonlist = pokemonAPI.GetPokemonListAll(currentPage);
                 _pokemonListSearch = PokeList.pokemonList;
             }
             else
             {
                 if (choice == 0)
                 {
-                    _pokemonlist = _apiRequest.GetPokemonListByTypeAll(currentPage, type);
+                    _pokemonlist = pokemonAPI.GetPokemonListByTypeAll(currentPage, type);
                     _pokemonListSearch = PokeList.pokemonListAllType;
                 }
                 if (choice == 1)
                 {
-                    _pokemonlist = _apiRequest.GetPokemonListByTypePure(currentPage, type);
+                    _pokemonlist = pokemonAPI.GetPokemonListByTypePure(currentPage, type);
                     _pokemonListSearch = PokeList.pokemonListPureType;
                 }
                 else if (choice == 2)
                 {
-                    _pokemonlist = _apiRequest.GetPokemonListByTypeHalfType(currentPage, type);
+                    _pokemonlist = pokemonAPI.GetPokemonListByTypeHalfType(currentPage, type);
                     _pokemonListSearch = PokeList.pokemonListHalfType;
                 }
                 else if (choice == 3)
                 {
-                    _pokemonlist = _apiRequest.GetPokemonlistByHalfTypeSecondary(currentPage, type);
+                    _pokemonlist = pokemonAPI.GetPokemonlistByHalfTypeSecondary(currentPage, type);
                     _pokemonListSearch = PokeList.pokemonListHalfSecundaryType;
                 }
             }
@@ -72,7 +73,7 @@ namespace PokeApi.BackEnd.Service
                             if (VerifyButtonName(btn.Name))
                             {
                                 var pokemon = _pokemonlist[buttonIndex];
-                                UpdateButtonImages(btn, pokemon.Id);
+                                UpdateButtonImages(btn, pokemon.Id, new PokemonImageApiRequest());
                             }
 
                             buttonIndex++;
@@ -117,7 +118,7 @@ namespace PokeApi.BackEnd.Service
                             if (VerifyButtonName(btn.Name))
                             {
                                 var pokemon = _pokemonListSearch[buttonIndex];
-                                UpdateButtonImages(btn, pokemon.Id);
+                                UpdateButtonImages(btn, pokemon.Id, new PokemonImageApiRequest());
                             }
 
                             buttonIndex++;
@@ -134,11 +135,11 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        private async void UpdateButtonImages(Button button, int id)
+        private async void UpdateButtonImages(Button button, int id, IPokemonSpriteLoaderAPI pokemonSpriteLoaderAPI)
         {
             Image pokeimage = new Image();
 
-            Pixbuf pokemonImage = await _apiRequest.LoadPokemonSprite(id);
+            Pixbuf pokemonImage = await pokemonSpriteLoaderAPI.LoadPokemonSprite(id);
             if (pokemonImage != null)
             {
                 pokemonImage = pokemonImage.ScaleSimple(50, 50, InterpType.Bilinear);
