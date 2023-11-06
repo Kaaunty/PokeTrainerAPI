@@ -1,4 +1,5 @@
 ﻿using Gdk;
+using Gtk;
 using PokeApi.BackEnd.Entities;
 using System.Net;
 using static PokeApi.BackEnd.Service.PokemonApiRequest;
@@ -7,13 +8,16 @@ namespace PokeApi.BackEnd.Service
 {
     public class PokemonImageApiRequest : IPokemonSpriteLoaderAPI
     {
+#nullable disable
+
         private HttpClient _httpClient = new();
 
         public async Task<Pixbuf> LoadPokemonSprite(int id)
         {
-            string pokemonName = PokeList.pokemonList.FirstOrDefault(pokemon => pokemon.Id == id).Name;
             try
             {
+                Image pokemonImage = new();
+
                 if (PokeList.pokemonImageCache.ContainsKey(id))
                 {
                     return PokeList.pokemonImageCache[id];
@@ -24,34 +28,34 @@ namespace PokeApi.BackEnd.Service
                 string url = poke.Sprites.FrontDefault;
                 url ??= poke.Sprites.Versions.GenerationVIII.Icons.FrontDefault;
                 url ??= poke.Sprites.Versions.GenerationVII.Icons.FrontDefault;
-                url ??= $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName}.png";
+                url ??= $"https://play.pokemonshowdown.com/sprites/gen5/{poke.Name}.png";
                 if (url == "")
                 {
-                    if (pokemonName.Contains("koraidon"))
+                    if (poke.Name.Contains("koraidon"))
                     {
                         url = "https://play.pokemonshowdown.com/sprites/gen5/koraidon.png";
                     }
-                    else if (pokemonName.Contains("-totem") && pokemonName != "kommo-o-totem")
+                    else if (poke.Name.Contains("-totem") && poke.Name != "kommo-o-totem")
                     {
-                        url = $"https://play.pokemonshowdown.com/sprites/gen5/{pokemonName.Replace("-totem", "")}.png";
+                        url = $"https://play.pokemonshowdown.com/sprites/gen5/{poke.Name.Replace("-totem", "")}.png";
                     }
-                    else if (pokemonName.Contains("kommo-o-totem"))
+                    else if (poke.Name.Contains("kommo-o-totem"))
                     {
                         url = "https://play.pokemonshowdown.com/sprites/gen5/kommoo.png";
                     }
-                    else if (pokemonName == "pikachu-world-cap")
+                    else if (poke.Name == "pikachu-world-cap")
                     {
                         url = "https://play.pokemonshowdown.com/sprites/gen5/pikachu-world.png";
                     }
-                    else if (pokemonName.Contains("miraidon"))
+                    else if (poke.Name.Contains("miraidon"))
                     {
                         url = "https://play.pokemonshowdown.com/sprites/gen5/miraidon.png";
                     }
-                    else if (pokemonName.Contains("ogerpon-wellspring-mask"))
+                    else if (poke.Name.Contains("ogerpon-wellspring-mask"))
                     {
                         url = "https://play.pokemonshowdown.com/sprites/gen5/ogerpon-wellspring.png";
                     }
-                    else if (pokemonName == "mimikyu-totem-disguised")
+                    else if (poke.Name == "mimikyu-totem-disguised")
                     {
                         url = "https://play.pokemonshowdown.com/sprites/gen5/mimikyu.png";
                     }
@@ -64,8 +68,6 @@ namespace PokeApi.BackEnd.Service
                 }
                 else if (response.IsSuccessStatusCode)
                 {
-                    response.EnsureSuccessStatusCode();
-
                     var result = await _httpClient.GetByteArrayAsync(url);
 
                     if (result != null)
@@ -75,17 +77,16 @@ namespace PokeApi.BackEnd.Service
                             loader.Write(result);
                             loader.Close();
 
-                            var pokemonImage = loader.Pixbuf;
-                            PokeList.pokemonImageCache[id] = pokemonImage;
-                            return pokemonImage;
+                            pokemonImage.Pixbuf = loader.Pixbuf;
+                            PokeList.pokemonImageCache[id] = pokemonImage.Pixbuf;
+                            return pokemonImage.Pixbuf;
                         }
                     }
                 }
-                return null;
+                return pokemonImage.Pixbuf;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine("Erro ao carregar a imagem." + ex + "Pokemon:" + pokemonName);
                 return null;
             }
         }
