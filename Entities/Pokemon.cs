@@ -270,7 +270,7 @@ namespace PokeTrainerBackEndTest.Entities
         {
             if (abilityWrapper.EffectEntries.Count == 0)
             {
-                Effect = "No description";
+                Effect = "No effect";
             }
             else
             {

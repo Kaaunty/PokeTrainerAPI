@@ -1,4 +1,10 @@
 ﻿using PokeTrainerBackEndTest.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static PokeApi.BackEnd.Service.PokemonApiRequest;
 
 namespace PokeTrainerBackEnd.Helper
 {
@@ -25,8 +31,8 @@ namespace PokeTrainerBackEnd.Helper
             {
                 var pokemonList = Repository.Pokemon;
 
-                Repository.pokemonListAllType = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
-                pokemonList = Repository.pokemonListAllType.Skip(currentpage).Take(25).ToList();
+                PokeList.pokemonListAllType = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
+                pokemonList = PokeList.pokemonListAllType.Skip(currentpage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
@@ -42,8 +48,8 @@ namespace PokeTrainerBackEnd.Helper
             {
                 var pokemonList = Repository.Pokemon;
 
-                Repository.pokemonListPureType = pokemonList.Where(pokemon => pokemon.Types.TrueForAll(type => type.Slot == 1) && pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
-                pokemonList = Repository.pokemonListPureType.Skip(currentpage).Take(25).ToList();
+                PokeList.pokemonListPureType = pokemonList.Where(pokemon => pokemon.Types.TrueForAll(type => type.Slot == 1) && pokemon.Types.Any(type => type.Type.Name == lowercasetype)).ToList();
+                pokemonList = PokeList.pokemonListPureType.Skip(currentpage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
@@ -59,8 +65,8 @@ namespace PokeTrainerBackEnd.Helper
             {
                 var pokemonList = Repository.Pokemon;
 
-                Repository.pokemonListHalfType = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype) && pokemon.Types.Any(type => type.Slot == 2)).ToList();
-                pokemonList = Repository.pokemonListHalfType.Skip(currentpage).Take(25).ToList();
+                PokeList.pokemonListHalfType = pokemonList.Where(pokemon => pokemon.Types.Any(type => type.Type.Name == lowercasetype) && pokemon.Types.Any(type => type.Slot == 2)).ToList();
+                pokemonList = PokeList.pokemonListHalfType.Skip(currentpage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
@@ -76,8 +82,8 @@ namespace PokeTrainerBackEnd.Helper
             {
                 var pokemonList = Repository.Pokemon;
 
-                Repository.pokemonListHalfSecundaryType = pokemonList.Where(pokemon => pokemon.Types.Count == 2 && pokemon.Types[1].Type.Name == lowercasetype).ToList();
-                pokemonList = Repository.pokemonListHalfSecundaryType.Skip(currentPage).Take(25).ToList();
+                PokeList.pokemonListHalfSecundaryType = pokemonList.Where(pokemon => pokemon.Types.Count == 2 && pokemon.Types[1].Type.Name == lowercasetype).ToList();
+                pokemonList = PokeList.pokemonListHalfSecundaryType.Skip(currentPage).Take(25).ToList();
                 return pokemonList;
             }
             catch (Exception)
