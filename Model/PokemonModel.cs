@@ -71,6 +71,7 @@ namespace PokeTrainerBackEndTest.Model
                     {
                         AbilityWrapper abilityWrapper = Repository.AbilityWrappers.FirstOrDefault(abilitywrapper => abilitywrapper.Name == abilityResponse.Name);
                         ability = new Ability(abilityWrapper, abilityResponse);
+
                         abilitiesDesc.Add(ability);
                     }
                 }
