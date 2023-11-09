@@ -1,6 +1,7 @@
 ﻿using PokeApi.BackEnd.Entities;
 using PokeTrainerBackEnd;
 using PokeTrainerBackEndTest.Entities;
+using System.Linq;
 using System.Net;
 
 namespace PokeApi.BackEnd.Service
@@ -80,94 +81,20 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public async Task GetPokemonAnimatedSprite(string pokemonName, bool shiny)
+        public void GetPokemonAnimatedSprite(string pokemonName, bool shiny)
         {
-            #region if's
+            if (Repository.PokemonNameCorrection.ContainsKey(pokemonName))
+                Repository.PokemonNameCorrection.TryGetValue(pokemonName, out pokemonName);
 
-            if (pokemonName == "giratina-altered")
-            {
-                pokemonName = "giratina";
-            }
-            else if (pokemonName.Contains("mega-y"))
-            {
-                pokemonName = pokemonName.Replace("mega-y", "megay");
-            }
-            else if (pokemonName.Contains("mega-x"))
-            {
-                pokemonName = pokemonName.Replace("mega-x", "megax");
-            }
-            else if (pokemonName.Contains("-natural"))
-            {
-                pokemonName = pokemonName.Replace("-natural", "");
-            }
-            else if (pokemonName.Contains("-normal"))
-            {
-                pokemonName = pokemonName.Replace("-normal", "");
-            }
-            else if (pokemonName.Contains("amped-gmax"))
-            {
-                pokemonName = pokemonName.Replace("amped-gmax", "gmax");
-            }
-            else if (pokemonName.Contains("-low-key"))
-            {
-                pokemonName = pokemonName.Replace("-low-key", "-lowkey");
-            }
-            else if (pokemonName.Contains("toxtricity-amped"))
-            {
-                pokemonName = pokemonName.Replace("toxtricity-amped", "toxtricity");
-            }
-            else if (pokemonName.Contains("furfrou-la-reine"))
-            {
-                pokemonName = pokemonName.Replace("la-reine", "lareine");
-            }
-            else if (pokemonName.Contains("necrozma-dawn"))
-            {
-                pokemonName = pokemonName.Replace("dawn", "dawnwings");
-            }
-            else if (pokemonName.Contains("necrozma-dusk"))
-            {
-                pokemonName = pokemonName.Replace("dusk", "duskmane");
-            }
-            else if (pokemonName.Contains("oinkologne-female"))
-            {
-                pokemonName = pokemonName.Replace("-female", "-f");
-            }
-            else if (pokemonName.Contains("plumage"))
-            {
-                pokemonName = pokemonName.Replace("-plumage", "");
-            }
-            else if (pokemonName.Contains("family-of-three"))
-            {
-                pokemonName = pokemonName.Replace("family-of-three", "four");
-            }
-            else if (pokemonName.Contains("disguised"))
-            {
-                pokemonName = pokemonName.Replace("-disguised", "");
-            }
-            else if (pokemonName.Contains("totem-busted"))
-            {
-                pokemonName = pokemonName.Replace("totem-busted", "busted-totem");
-            }
-            else if (pokemonName.Contains("nidoran-m"))
-            {
-                pokemonName = pokemonName.Replace("-m", "");
-            }
-
-            #endregion if's
-
-            string imageUrl = "";
+            string imageUrl;
 
             if (shiny)
-            {
                 imageUrl = $"https://play.pokemonshowdown.com/sprites/ani-shiny/{pokemonName.ToLower()}.gif";
-            }
             else
-            {
                 imageUrl = $"https://play.pokemonshowdown.com/sprites/xyani/{pokemonName.ToLower()}.gif";
-            }
 
             string pastaDestino = "Images";
-            string nomeArquivo = "";
+
             try
             {
                 var response = _httpClient.GetAsync(imageUrl).Result;
@@ -177,7 +104,7 @@ namespace PokeApi.BackEnd.Service
 
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    await GetPokemonStaticSprite(pokemonName, shiny);
+                    GetPokemonStaticSprite(pokemonName, shiny);
                 }
                 else if (response.IsSuccessStatusCode)
                 {
@@ -187,6 +114,7 @@ namespace PokeApi.BackEnd.Service
                     {
                         Directory.CreateDirectory(pastaDestino);
                     }
+                    string nomeArquivo;
                     if (shiny)
                     {
                         nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
@@ -205,58 +133,14 @@ namespace PokeApi.BackEnd.Service
             }
         }
 
-        public async Task GetPokemonStaticSprite(string pokemonName, bool shiny)
+        public void GetPokemonStaticSprite(string pokemonName, bool shiny)
         {
-            #region if's name validation
+            string imageUrl;
 
-            string imageUrl = "";
-
-            if (pokemonName == "giratina-altered")
+            if (Repository.PokemonNameCorrection.ContainsKey(pokemonName))
             {
-                pokemonName = "giratina";
+                Repository.PokemonNameCorrection.TryGetValue(pokemonName, out pokemonName);
             }
-            if (pokemonName.Contains("mega-y"))
-            {
-                pokemonName = pokemonName.Replace("mega-y", "megay");
-            }
-            if (pokemonName.Contains("mega-x"))
-            {
-                pokemonName = pokemonName.Replace("mega-x", "megax");
-            }
-            if (pokemonName.Contains("-natural"))
-            {
-                pokemonName = pokemonName.Replace("-natural", "");
-            }
-            if (pokemonName.Contains("-normal"))
-            {
-                pokemonName = pokemonName.Replace("-normal", "");
-            }
-            if (pokemonName.Contains("koraidon"))
-            {
-                pokemonName = pokemonName.Replace(pokemonName, "koraidon");
-            }
-            if (pokemonName.Contains("miraidon"))
-            {
-                pokemonName = pokemonName.Replace(pokemonName, "miraidon");
-            }
-            if (pokemonName == "tauros-paldea-combat-breed")
-            {
-                pokemonName = "tauros-paldeacombat";
-            }
-            if (pokemonName == "tauros-paldea-blaze-breed")
-            {
-                pokemonName = "tauros-paldeablaze";
-            }
-            if (pokemonName == "tauros-paldea-aqua-breed")
-            {
-                pokemonName = "tauros-paldeaaqua";
-            }
-            if (pokemonName == "roaring-moon")
-            {
-                pokemonName = "roaringmoon";
-            }
-
-            #endregion if's name validation
 
             if (shiny)
             {
@@ -268,15 +152,15 @@ namespace PokeApi.BackEnd.Service
             }
 
             string pastaDestino = "Images";
-            string nomeArquivo = "";
             try
             {
-                byte[] gifBytes = await _httpClient.GetByteArrayAsync(imageUrl);
+                byte[] gifBytes = _httpClient.GetByteArrayAsync(imageUrl).Result;
 
                 if (!Directory.Exists(pastaDestino))
                 {
                     Directory.CreateDirectory(pastaDestino);
                 }
+                string nomeArquivo;
                 if (shiny)
                 {
                     nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");

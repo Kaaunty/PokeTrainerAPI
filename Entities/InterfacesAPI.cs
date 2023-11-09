@@ -38,8 +38,8 @@ namespace PokeApi.BackEnd.Entities
     {
         public Task<Byte[]> LoadPokemonSprite(int id);
 
-        public Task GetPokemonAnimatedSprite(string pokemonName, bool shiny);
+        public void GetPokemonAnimatedSprite(string pokemonName, bool shiny);
 
-        public Task GetPokemonStaticSprite(string pokemonName, bool shiny);
+        public void GetPokemonStaticSprite(string pokemonName, bool shiny);
     }
 }
