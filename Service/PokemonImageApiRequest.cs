@@ -1,8 +1,7 @@
-﻿using Gdk;
-using Gtk;
-using PokeApi.BackEnd.Entities;
+﻿using PokeApi.BackEnd.Entities;
+using PokeTrainerBackEnd;
+using PokeTrainerBackEndTest.Entities;
 using System.Net;
-using static PokeApi.BackEnd.Service.PokemonApiRequest;
 
 namespace PokeApi.BackEnd.Service
 {
@@ -12,22 +11,19 @@ namespace PokeApi.BackEnd.Service
 
         private HttpClient _httpClient = new();
 
-        public async Task<Pixbuf> LoadPokemonSprite(int id)
+        public async Task<Byte[]> LoadPokemonSprite(int id)
         {
             try
             {
-                Image pokemonImage = new();
-
-                if (PokeList.pokemonImageCache.ContainsKey(id))
+                Byte[] ImageBytes = new Byte[0];
+                if (Repository.pokemonImageCache.ContainsKey(id))
                 {
-                    return PokeList.pokemonImageCache[id];
+                    return Repository.pokemonImageCache[id];
                 }
 
-                var poke = PokeList.pokemonList.FirstOrDefault(pokemon => pokemon.Id == id);
+                var poke = Repository.Pokemon.FirstOrDefault(pokemon => pokemon.Id == id);
 
-                string url = poke.Sprites.FrontDefault;
-                url ??= poke.Sprites.Versions.GenerationVIII.Icons.FrontDefault;
-                url ??= poke.Sprites.Versions.GenerationVII.Icons.FrontDefault;
+                string url = poke.SpriteUrl;
                 url ??= $"https://play.pokemonshowdown.com/sprites/gen5/{poke.Name}.png";
                 if (url == "")
                 {
@@ -68,22 +64,15 @@ namespace PokeApi.BackEnd.Service
                 }
                 else if (response.IsSuccessStatusCode)
                 {
-                    var result = await _httpClient.GetByteArrayAsync(url);
+                    ImageBytes = await _httpClient.GetByteArrayAsync(url);
 
-                    if (result != null)
+                    if (ImageBytes != null)
                     {
-                        using (PixbufLoader loader = new PixbufLoader())
-                        {
-                            loader.Write(result);
-                            loader.Close();
-
-                            pokemonImage.Pixbuf = loader.Pixbuf;
-                            PokeList.pokemonImageCache[id] = pokemonImage.Pixbuf;
-                            return pokemonImage.Pixbuf;
-                        }
+                        Repository.pokemonImageCache.Add(id, ImageBytes);
+                        return ImageBytes;
                     }
                 }
-                return pokemonImage.Pixbuf;
+                return ImageBytes;
             }
             catch (Exception)
             {
@@ -181,7 +170,10 @@ namespace PokeApi.BackEnd.Service
             string nomeArquivo = "";
             try
             {
-                var response = await _httpClient.GetAsync(imageUrl);
+                var response = _httpClient.GetAsync(imageUrl).Result;
+                if (response != null)
+                {
+                }
 
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
@@ -189,7 +181,7 @@ namespace PokeApi.BackEnd.Service
                 }
                 else if (response.IsSuccessStatusCode)
                 {
-                    byte[] gifBytes = await _httpClient.GetByteArrayAsync(imageUrl);
+                    byte[] gifBytes = _httpClient.GetByteArrayAsync(imageUrl).Result;
 
                     if (!Directory.Exists(pastaDestino))
                     {

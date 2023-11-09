@@ -1,40 +1,30 @@
-﻿using Type = PokeApiNet.Type;
-using PokeApiNet;
-using Gdk;
+﻿using PokeTrainerBackEndTest.Entities;
 
 namespace PokeApi.BackEnd.Entities
 {
     public interface IPokemonAPI
     {
+        public Task<PokemonResponse> GetPokemon(int pokemonId);
+
+        public Task<PokemonSpecies> GetPokemonSpecies(string pokemonId);
+
+        public Task<EvolutionChain> GetEvolution(string url);
+
+        public Task<List<AbilityWrapper>> GetAbilityListAsync();
+
+        public Task<AbilityWrapper> GetAbilityDescription(string abilityName);
+
+        public Task<MoveWrapper> GetMove(string moveName);
+
+        public Task<PokemonFormResponse> GetPokemonForm(string pokemonName);
+
+        public Task<List<MoveWrapper>> PopulateMoveList();
+
+        public Task<List<int>> LoadPokemonsListAll();
+
         public Task<double> GetPokemonTotalCount();
 
-        public Task<Pokemon> GetPokemon(string name);
-
-        public Pokemon GetPokemonByName(string pokemonName);
-
-        public Task<Type> GetTypeAsync(string name);
-
-        public Task<List<Move>> GetMoveLearnedByPokemon(Pokemon pokemon);
-
-        public Task<List<Pokemon>> LoadPokemonsListAll();
-
-        public List<Pokemon> GetPokemonListAll(int currentpage);
-
-        public List<Pokemon> GetPokemonListByTypePure(int currentpage, string type);
-
-        public List<Pokemon> GetPokemonListByTypeAll(int currentpage, string type);
-
-        public List<Pokemon> GetPokemonListByTypeHalfType(int currentpage, string type);
-
-        public List<Pokemon> GetPokemonlistByHalfTypeSecondary(int currentPage, string type);
-
-        public Task<PokemonSpecies> GetPokemonSpecies(string pokemonName);
-
-        public Task<EvolutionChain> GetEvolutionChain(string nextEvolution);
-
-        public Task<PokemonForm> GetPokemonForm(string name);
-
-        public Task<Ability> GetPokemonAbility(string abilityName);
+        Pokemon GetPokemonByName(string name);
     }
 
     public interface ITranslationAPI
@@ -46,7 +36,7 @@ namespace PokeApi.BackEnd.Entities
 
     public interface IPokemonSpriteLoaderAPI
     {
-        public Task<Pixbuf> LoadPokemonSprite(int id);
+        public Task<Byte[]> LoadPokemonSprite(int id);
 
         public Task GetPokemonAnimatedSprite(string pokemonName, bool shiny);
 
