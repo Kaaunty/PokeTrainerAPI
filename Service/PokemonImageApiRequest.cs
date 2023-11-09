@@ -1,6 +1,5 @@
 ﻿using PokeApi.BackEnd.Entities;
 using PokeTrainerBackEnd;
-using PokeTrainerBackEndTest.Entities;
 using System.Net;
 
 namespace PokeApi.BackEnd.Service
