@@ -17,10 +17,4 @@
 	  <None Remove="README.md" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="GdkSharp" Version="3.24.24.95" />
-		<PackageReference Include="GtkSharp" Version="3.24.24.95" />
-		<PackageReference Include="PokeApiNet" Version="3.0.10" />
-	</ItemGroup>
-
 </Project>
