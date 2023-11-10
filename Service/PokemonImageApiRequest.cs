@@ -1,7 +1,5 @@
 ﻿using PokeApi.BackEnd.Entities;
 using PokeTrainerBackEnd;
-using PokeTrainerBackEndTest.Entities;
-using System.Linq;
 using System.Net;
 
 namespace PokeApi.BackEnd.Service
@@ -9,14 +7,14 @@ namespace PokeApi.BackEnd.Service
     public class PokemonImageApiRequest : IPokemonSpriteLoaderAPI
     {
 #nullable disable
-
+     
         private HttpClient _httpClient = new();
 
         public async Task<Byte[]> LoadPokemonSprite(int id)
         {
             try
             {
-                Byte[] ImageBytes = new Byte[0];
+                Byte[] ImageBytes = Array.Empty<byte>();
                 if (Repository.pokemonImageCache.ContainsKey(id))
                 {
                     return Repository.pokemonImageCache[id];
