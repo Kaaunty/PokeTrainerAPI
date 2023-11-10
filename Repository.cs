@@ -69,7 +69,16 @@ namespace PokeTrainerBackEnd
             Repository.PokemonNameCorrection.Add("miraidon-drive-mode", "miraidon");
             Repository.PokemonNameCorrection.Add("miraidon-aquatic-mode", "miraidon");
             Repository.PokemonNameCorrection.Add("miraidon-glide-mode", "miraidon");
-
+            Repository.PokemonNameCorrection.Add("squawkabilly-blue-plumage", "squawkabilly-blue");
+            Repository.PokemonNameCorrection.Add("squawkabilly-yellow-plumage", "squawkabilly-yellow");
+            Repository.PokemonNameCorrection.Add("squawkabilly-white-plumage", "squawkabilly-white");
+            Repository.PokemonNameCorrection.Add("minior-orange-meteor", "minior-orange");
+            Repository.PokemonNameCorrection.Add("minior-blue-meteor", "minior-blue");
+            Repository.PokemonNameCorrection.Add("minior-green-meteor", "minior-green");
+            Repository.PokemonNameCorrection.Add("minior-indigo-meteor", "minior-indigo");
+            Repository.PokemonNameCorrection.Add("minior-meteor", "minior-meteor");
+            Repository.PokemonNameCorrection.Add("minior-violet-meteor", "minior-violet");
+            Repository.PokemonNameCorrection.Add("minior-yellow-meteor", "minior-yellow");
         }
     }
 }
