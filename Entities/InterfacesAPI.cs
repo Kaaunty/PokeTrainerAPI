@@ -41,5 +41,7 @@ namespace PokeApi.BackEnd.Entities
         public void GetPokemonAnimatedSprite(string pokemonName, bool shiny);
 
         public void GetPokemonStaticSprite(string pokemonName, bool shiny);
+
+        public void GetPokemonAnimatedSpritePixel(string pokemonName, bool shiny);
     }
 }

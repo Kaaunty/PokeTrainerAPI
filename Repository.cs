@@ -65,7 +65,13 @@ namespace PokeTrainerBackEnd
             Repository.PokemonNameCorrection.Add("tauros-paldea-blaze-breed", "tauros-paldeablaze");
             Repository.PokemonNameCorrection.Add("tauros-paldea-aqua-breed", "tauros-paldeaaqua");
             Repository.PokemonNameCorrection.Add("roaring-moon", "roaringmoon");
-            //Repository.PokemonNameCorrection.Add("", "");
+            Repository.PokemonNameCorrection.Add("koraidon-sprinting-build", "koraidon");
+            Repository.PokemonNameCorrection.Add("koraidon-swimming-build", "koraidon");
+            Repository.PokemonNameCorrection.Add("koraidon-gliding-build", "koraidon");
+            Repository.PokemonNameCorrection.Add("miraidon-drive-mode", "miraidon");
+            Repository.PokemonNameCorrection.Add("miraidon-aquatic-mode", "miraidon");
+            Repository.PokemonNameCorrection.Add("miraidon-glide-mode", "miraidon");
+
         }
     }
 }

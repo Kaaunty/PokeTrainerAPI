@@ -104,7 +104,7 @@ namespace PokeApi.BackEnd.Service
 
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    GetPokemonStaticSprite(pokemonName, shiny);
+                    GetPokemonAnimatedSpritePixel(pokemonName, shiny);
                 }
                 else if (response.IsSuccessStatusCode)
                 {
@@ -130,6 +130,59 @@ namespace PokeApi.BackEnd.Service
             catch (Exception)
             {
                 Console.WriteLine("Erro ao carregar a imagem.");
+            }
+        }
+
+        public void GetPokemonAnimatedSpritePixel(string pokemonName, bool shiny)
+        {
+            string imageUrl;
+
+            if (Repository.PokemonNameCorrection.ContainsKey(pokemonName))
+            {
+                Repository.PokemonNameCorrection.TryGetValue(pokemonName, out pokemonName);
+            }
+
+            if (shiny)
+            {
+                imageUrl = $"https://play.pokemonshowdown.com/sprites/gen5ani-shiny/{pokemonName.ToLower()}.gif";
+            }
+            else
+            {
+                imageUrl = $"https://play.pokemonshowdown.com/sprites/gen5ani/{pokemonName.ToLower()}.gif";
+            }
+
+            string pastaDestino = "Images";
+            try
+            {
+                var response = _httpClient.GetAsync(imageUrl).Result;
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    GetPokemonStaticSprite(pokemonName, shiny);
+                }
+                else if (response.IsSuccessStatusCode)
+                    if (response != null)
+                    {
+                        byte[] gifBytes = _httpClient.GetByteArrayAsync(imageUrl).Result;
+
+                        if (!Directory.Exists(pastaDestino))
+                        {
+                            Directory.CreateDirectory(pastaDestino);
+                        }
+                        string nomeArquivo;
+                        if (shiny)
+                        {
+                            nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimatedShiny.gif");
+                        }
+                        else
+                        {
+                            nomeArquivo = Path.Combine(pastaDestino, "PokemonAnimated.gif");
+                        }
+                        File.WriteAllBytes(nomeArquivo, gifBytes);
+                    }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao carregar a imagem." + ex);
             }
         }
 

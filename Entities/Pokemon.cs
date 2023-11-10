@@ -323,12 +323,14 @@ namespace PokeTrainerBackEndTest.Entities
         public PokemonForm(PokemonFormResponse pokemonFormResponse)
         {
             Name = pokemonFormResponse.Name;
+            FormName = pokemonFormResponse.FormName;
             IsMega = pokemonFormResponse.IsMega;
             IsDefault = pokemonFormResponse.IsDefault;
             Types = pokemonFormResponse.Types;
         }
 
         public string Name { get; set; }
+        public string FormName { get; set; }
 
         public bool IsDefault { get; set; }
         public bool IsMega { get; set; }
