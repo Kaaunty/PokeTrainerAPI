@@ -63,10 +63,9 @@ namespace PokeTrainerBackEndTest.Model
             try
             {
                 List<Ability> abilitiesDesc = new();
-
+                Ability ability;
                 foreach (var abilityResponse in abilities)
                 {
-
                     if (!abilitiesDesc.Contains(abilitiesDesc.FirstOrDefault(ability => ability.Name == abilityResponse.Name)))
                     {
                         AbilityWrapper abilityWrapper = Repository.AbilityWrappers.FirstOrDefault(abilitywrapper => abilitywrapper.Name == abilityResponse.Name);
@@ -74,7 +73,6 @@ namespace PokeTrainerBackEndTest.Model
 
                         abilitiesDesc.Add(ability);
                     }
-
                 }
                 return abilitiesDesc;
             }
