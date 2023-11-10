@@ -1,5 +1,4 @@
-﻿using PokeTrainerBackEndTest.Controller;
-using PokeTrainerBackEndTest.Entities;
+﻿using PokeTrainerBackEndTest.Entities;
 using PokeTrainerBackEndTest.Model;
 using System.Xml.Serialization;
 
@@ -37,7 +36,7 @@ namespace PokeTrainerBackEnd.Helper
                 XmlSerializer xmlSerealizer = new XmlSerializer(typeof(List<Pokemon>));
                 using (FileStream fs = new FileStream("Xml's/pokemonList.xml", FileMode.Open))
                 {
-                    Repository.pokemonsList = (List<Pokemon>)xmlSerealizer.Deserialize(fs);
+                    Repository.pokemonList = (List<Pokemon>)xmlSerealizer.Deserialize(fs);
                     fs.Close();
                 }
             }
