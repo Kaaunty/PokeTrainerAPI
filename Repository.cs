@@ -4,27 +4,25 @@ namespace PokeTrainerBackEnd
 {
     public static class Repository
     {
-        public static List<Pokemon> pokemonsList = new List<Pokemon>();
-
-        private static List<MoveWrapper> moves = new List<MoveWrapper>();
-
-        private static List<AbilityWrapper> abilities = new List<AbilityWrapper>();
-
-        public static Dictionary<int, Byte[]> pokemonImageCache = new Dictionary<int, Byte[]>();
+        private static List<AbilityWrapper> abilities = new();
+        private static List<MoveWrapper> moves = new();
 
         private static Dictionary<string, string> pokemonNameCorrection = new();
 
-        public static List<Pokemon> pokemonList = new List<Pokemon>();
-        public static List<Pokemon> pokemonListAllType = new List<Pokemon>();
-        public static List<Pokemon> pokemonListPureType = new List<Pokemon>();
-        public static List<Pokemon> pokemonListHalfType = new List<Pokemon>();
-        public static List<Pokemon> pokemonListHalfSecundaryType = new List<Pokemon>();
+        public static Dictionary<int, Byte[]> pokemonImageCache = new();
 
-        public static Dictionary<string, string> typeDamageRelations = new();
+        public static List<Pokemon> pokemonList = new();
+        public static List<Pokemon> pokemonListAllType = new();
+        public static List<Pokemon> pokemonListPureType = new();
+        public static List<Pokemon> pokemonListHalfType = new();
+        public static List<Pokemon> pokemonListHalfSecundaryType = new();
+
         public static List<AbilityWrapper> AbilityWrappers { get => abilities; }
-        public static Dictionary<string, string> PokemonNameCorrection { get => pokemonNameCorrection; }
+        public static List<Pokemon> Pokemon { get => pokemonList; }
         public static List<MoveWrapper> Moves { get => moves; }
-        public static List<Pokemon> Pokemon { get => pokemonsList; }
+
+        public static Dictionary<string, string> PokemonNameCorrection { get => pokemonNameCorrection; }
+        public static Dictionary<string, string> typeDamageRelations = new();
     }
 
     public static class RepositoryPopulation
@@ -71,7 +69,16 @@ namespace PokeTrainerBackEnd
             Repository.PokemonNameCorrection.Add("miraidon-drive-mode", "miraidon");
             Repository.PokemonNameCorrection.Add("miraidon-aquatic-mode", "miraidon");
             Repository.PokemonNameCorrection.Add("miraidon-glide-mode", "miraidon");
-
+            Repository.PokemonNameCorrection.Add("squawkabilly-blue-plumage", "squawkabilly-blue");
+            Repository.PokemonNameCorrection.Add("squawkabilly-yellow-plumage", "squawkabilly-yellow");
+            Repository.PokemonNameCorrection.Add("squawkabilly-white-plumage", "squawkabilly-white");
+            Repository.PokemonNameCorrection.Add("minior-orange-meteor", "minior-orange");
+            Repository.PokemonNameCorrection.Add("minior-blue-meteor", "minior-blue");
+            Repository.PokemonNameCorrection.Add("minior-green-meteor", "minior-green");
+            Repository.PokemonNameCorrection.Add("minior-indigo-meteor", "minior-indigo");
+            Repository.PokemonNameCorrection.Add("minior-meteor", "minior-meteor");
+            Repository.PokemonNameCorrection.Add("minior-violet-meteor", "minior-violet");
+            Repository.PokemonNameCorrection.Add("minior-yellow-meteor", "minior-yellow");
         }
     }
 }
